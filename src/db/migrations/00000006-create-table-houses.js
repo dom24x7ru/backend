@@ -7,6 +7,7 @@ var Sequelize = require('sequelize');
  *
  * createTable "houses", deps: []
  * addColumn houseId to flats
+ * addIndex "flats_houseId" to table "flats"
  *
  **/
 
@@ -79,6 +80,20 @@ var migrationCommands = [
         },
         "allowNull": true,
         "type": Sequelize.INTEGER
+      }
+    ]
+  },
+
+  // addIndex flats houseId
+  {
+    fn: "addIndex",
+    params: [
+      "flats",
+      [{
+        "name": "houseId"
+      }],
+      {
+        "indexName": "flats_houseId"
       }
     ]
   }

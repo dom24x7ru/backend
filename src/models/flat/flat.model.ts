@@ -1,4 +1,4 @@
-import { BelongsTo, Column, DataType, ForeignKey, HasMany, Index, Model, Table, Unique } from "sequelize-typescript";
+import { BelongsTo, Column, DataType, ForeignKey, HasMany, Index, Model, Table } from "sequelize-typescript";
 import { House, Resident } from "..";
 
 @Table({
@@ -15,7 +15,7 @@ export default class Flat extends Model<Flat> {
   @BelongsTo(() => House)
   house: House;
   
-  @Unique
+  @Index
   @Column({
     comment: "Номер квартиры"
   })

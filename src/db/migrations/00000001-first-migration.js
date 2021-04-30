@@ -46,6 +46,7 @@ var Sequelize = require('sequelize');
  * addIndex "im_channel_persons_person_id" to table "imChannelPersons"
  * addIndex "im_channel_persons_channel_id" to table "imChannelPersons"
  * addIndex "notification_tokens_user_id" to table "notificationTokens"
+ * addIndex "flats_number" to table "flats"
  *
  **/
 
@@ -105,7 +106,6 @@ var migrationCommands = [
         },
         "number": {
           "comment": "Номер квартиры",
-          "unique": true,
           "type": Sequelize.INTEGER
         },
         "section": {
@@ -1405,6 +1405,20 @@ var migrationCommands = [
       }],
       {
         "indexName": "notification_tokens_user_id"
+      }
+    ]
+  },
+
+  // addIndex flats number
+  {
+    fn: "addIndex",
+    params: [
+      "flats",
+      [{
+        "name": "number"
+      }],
+      {
+        "indexName": "flats_number"
       }
     ]
   }

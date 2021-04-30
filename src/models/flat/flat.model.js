@@ -24,7 +24,7 @@ __decorate([
     __metadata("design:type", __1.House)
 ], Flat.prototype, "house", void 0);
 __decorate([
-    sequelize_typescript_1.Unique,
+    sequelize_typescript_1.Index,
     sequelize_typescript_1.Column({
         comment: "Номер квартиры"
     }),
