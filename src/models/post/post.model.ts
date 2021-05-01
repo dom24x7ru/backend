@@ -1,10 +1,19 @@
-import { Column, DataType, Default, Index, Model, Table } from "sequelize-typescript";
+import { BelongsTo, Column, DataType, Default, ForeignKey, Index, Model, Table } from "sequelize-typescript";
+import { House } from "..";
 
 @Table({
   tableName: "posts",
   comment: "Новости"
 })
 export default class Post extends Model<Post> {
+
+  @Index
+  @ForeignKey(() => House)
+  @Column
+  houseId: number;
+
+  @BelongsTo(() => House)
+  house: House;
 
   @Column({
     comment: "Тип новости"

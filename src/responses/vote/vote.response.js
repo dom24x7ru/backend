@@ -20,7 +20,7 @@ class VoteResponse extends response_1.default {
         this.multi = model.multi;
         this.anonymous = model.anonymous;
         this.closed = model.closed;
-        this.house = model.house;
+        this.house = model.allHouse;
         this.section = model.section;
         this.floor = model.floor;
         this.persons = model.persons.length;

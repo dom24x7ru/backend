@@ -44,7 +44,7 @@ __decorate([
         comment: "Признак, что голосование на весь дом"
     }),
     __metadata("design:type", Boolean)
-], Vote.prototype, "house", void 0);
+], Vote.prototype, "allHouse", void 0);
 __decorate([
     sequelize_typescript_1.Column({
         comment: "Если указана секция, то голосование на конкретную секция, либо этаж конкретной секции, если еще и этаж указан"

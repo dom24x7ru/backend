@@ -1,5 +1,5 @@
 import { AllowNull, Column, DataType, HasMany, Model, Table, Unique } from "sequelize-typescript";
-import { Flat } from "..";
+import { Document, FAQCategory, Flat, IMChannel, Post } from "..";
 import { tDadataInfo } from "../../lib/dadata";
 
 export type tHouseExtra = {
@@ -51,4 +51,16 @@ export default class House extends Model<House> {
 
   @HasMany(() => Flat)
   flats: Flat[];
+
+  @HasMany(() => Post)
+  posts: Post[];
+
+  @HasMany(() => Document)
+  documents: Document[];
+
+  @HasMany(() => FAQCategory)
+  faqCategories: FAQCategory[];
+
+  @HasMany(() => IMChannel)
+  imChannels: IMChannel[];
 }

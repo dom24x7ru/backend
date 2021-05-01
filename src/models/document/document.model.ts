@@ -1,4 +1,5 @@
-import { AllowNull, Column, Model, Table } from "sequelize-typescript";
+import { AllowNull, BelongsTo, Column, ForeignKey, Index, Model, Table } from "sequelize-typescript";
+import { House } from "..";
 
 @Table({
   tableName: "documents",
@@ -6,6 +7,14 @@ import { AllowNull, Column, Model, Table } from "sequelize-typescript";
 })
 export default class Document extends Model<Document> {
 
+  @Index
+  @ForeignKey(() => House)
+  @Column
+  houseId: number;
+
+  @BelongsTo(() => House)
+  house: House;
+  
   @AllowNull(false)
   @Column
   title: string;

@@ -14,6 +14,16 @@ const __1 = require("..");
 let IMChannel = class IMChannel extends sequelize_typescript_1.Model {
 };
 __decorate([
+    sequelize_typescript_1.Index,
+    sequelize_typescript_1.ForeignKey(() => __1.House),
+    sequelize_typescript_1.Column,
+    __metadata("design:type", Number)
+], IMChannel.prototype, "houseId", void 0);
+__decorate([
+    sequelize_typescript_1.BelongsTo(() => __1.House),
+    __metadata("design:type", __1.House)
+], IMChannel.prototype, "house", void 0);
+__decorate([
     sequelize_typescript_1.Column,
     __metadata("design:type", String)
 ], IMChannel.prototype, "title", void 0);
@@ -24,7 +34,7 @@ __decorate([
         comment: "Признак, что канал для всего дома"
     }),
     __metadata("design:type", Boolean)
-], IMChannel.prototype, "house", void 0);
+], IMChannel.prototype, "allHouse", void 0);
 __decorate([
     sequelize_typescript_1.Index,
     sequelize_typescript_1.Column({

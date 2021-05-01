@@ -1,5 +1,5 @@
-import { Column, Default, HasMany, Index, Model, Table } from "sequelize-typescript";
-import { IMChannelPerson, IMMessage } from "..";
+import { BelongsTo, Column, Default, ForeignKey, HasMany, Index, Model, Table } from "sequelize-typescript";
+import { House, IMChannelPerson, IMMessage } from "..";
 
 @Table({
   tableName: "imChannels",
@@ -7,6 +7,14 @@ import { IMChannelPerson, IMMessage } from "..";
 })
 export default class IMChannel extends Model<IMChannel> {
 
+  @Index
+  @ForeignKey(() => House)
+  @Column
+  houseId: number;
+
+  @BelongsTo(() => House)
+  house: House;
+  
   @Column
   title: string;
 
@@ -15,7 +23,7 @@ export default class IMChannel extends Model<IMChannel> {
   @Column({
     comment: "Признак, что канал для всего дома"
   })
-  house: boolean;
+  allHouse: boolean;
 
   @Index
   @Column({

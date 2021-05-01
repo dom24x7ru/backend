@@ -14,7 +14,16 @@ const __1 = require("..");
 let FAQCategory = class FAQCategory extends sequelize_typescript_1.Model {
 };
 __decorate([
-    sequelize_typescript_1.Unique,
+    sequelize_typescript_1.Index,
+    sequelize_typescript_1.ForeignKey(() => __1.House),
+    sequelize_typescript_1.Column,
+    __metadata("design:type", Number)
+], FAQCategory.prototype, "houseId", void 0);
+__decorate([
+    sequelize_typescript_1.BelongsTo(() => __1.House),
+    __metadata("design:type", __1.House)
+], FAQCategory.prototype, "house", void 0);
+__decorate([
     sequelize_typescript_1.Column,
     __metadata("design:type", String)
 ], FAQCategory.prototype, "name", void 0);

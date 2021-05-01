@@ -130,7 +130,7 @@ export async function saveProfile({ surname, name, midname, telegram, flat, acce
         const votes = await Vote.findAll({ where: { closed: false } });
         if (votes != null) {
           for (let vote of votes) {
-            if (vote.house) {
+            if (vote.allHouse) {
               // голосование на весь дом
               const votePerson = await VotePerson.findOne({ where: { voteId: vote.id, personId: person.id } });
               if (votePerson == null) {
@@ -171,7 +171,7 @@ export async function saveProfile({ surname, name, midname, telegram, flat, acce
         const flatTxt = `кв. ${flatDb.number}, этаж ${flatDb.floor}, подъезд ${flatDb.section}`;
 
         // в общедомовой
-        let channel = await IMChannel.findOne({ where: { house: true } });
+        let channel = await IMChannel.findOne({ where: { allHouse: true } });
         IMChannelPerson.create({ channelId: channel.id, personId: person.id });
         IMMessage.create({ channelId: channel.id, body: { text: `Сосед(ка) из ${flatTxt} вступил(а) в группу` } });
         Cache.getInstance().clear(`imMessages:${channel.id}`);

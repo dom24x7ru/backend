@@ -93,7 +93,7 @@ var migrationCommands = [
         "name": "houseId"
       }],
       {
-        "indexName": "flats_houseId"
+        "indexName": "flats_house_id"
       }
     ]
   }

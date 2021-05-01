@@ -18,10 +18,10 @@ export async function save({ title, questions, anonymous, multi, type }, respond
     const flat = resident.flat;
 
     // создаем голосование
-    const house = type == "house";
+    const allHouse = type == "house";
     const section = type != "house" ? flat.section : null;
     const floor = type == "floor" ? flat.floor : null;
-    const vote = await Vote.create({ title, multi, anonymous, house, section, floor, userId: this.authToken.id });
+    const vote = await Vote.create({ title, multi, anonymous, allHouse, section, floor, userId: this.authToken.id });
 
     // добавляем вопросы к голосованию
     for (let question of questions) {

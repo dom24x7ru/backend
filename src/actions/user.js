@@ -161,7 +161,7 @@ function saveProfile({ surname, name, midname, telegram, flat, access }, respond
                     const votes = yield models_1.Vote.findAll({ where: { closed: false } });
                     if (votes != null) {
                         for (let vote of votes) {
-                            if (vote.house) {
+                            if (vote.allHouse) {
                                 // голосование на весь дом
                                 const votePerson = yield models_1.VotePerson.findOne({ where: { voteId: vote.id, personId: person.id } });
                                 if (votePerson == null) {
@@ -202,7 +202,7 @@ function saveProfile({ surname, name, midname, telegram, flat, access }, respond
                     const flatDb = yield models_1.Flat.findByPk(flat);
                     const flatTxt = `кв. ${flatDb.number}, этаж ${flatDb.floor}, подъезд ${flatDb.section}`;
                     // в общедомовой
-                    let channel = yield models_1.IMChannel.findOne({ where: { house: true } });
+                    let channel = yield models_1.IMChannel.findOne({ where: { allHouse: true } });
                     models_1.IMChannelPerson.create({ channelId: channel.id, personId: person.id });
                     models_1.IMMessage.create({ channelId: channel.id, body: { text: `Сосед(ка) из ${flatTxt} вступил(а) в группу` } });
                     cache_1.default.getInstance().clear(`imMessages:${channel.id}`);

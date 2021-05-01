@@ -42,7 +42,7 @@ var Sequelize = require('sequelize');
  * addIndex "im_messages_person_id" to table "imMessages"
  * addIndex "im_channels_floor" to table "imChannels"
  * addIndex "im_channels_section" to table "imChannels"
- * addIndex "im_channels_house" to table "imChannels"
+ * addIndex "im_channels_all_house" to table "imChannels"
  * addIndex "im_channel_persons_person_id" to table "imChannelPersons"
  * addIndex "im_channel_persons_channel_id" to table "imChannelPersons"
  * addIndex "notification_tokens_user_id" to table "notificationTokens"
@@ -269,7 +269,6 @@ var migrationCommands = [
           "type": Sequelize.INTEGER
         },
         "name": {
-          "unique": true,
           "type": Sequelize.STRING
         },
         "description": {
@@ -305,7 +304,7 @@ var migrationCommands = [
         "title": {
           "type": Sequelize.STRING
         },
-        "house": {
+        "allHouse": {
           "comment": "Признак, что канал для всего дома",
           "defaultValue": false,
           "type": Sequelize.BOOLEAN
@@ -800,7 +799,7 @@ var migrationCommands = [
           "defaultValue": false,
           "type": Sequelize.BOOLEAN
         },
-        "house": {
+        "allHouse": {
           "comment": "Признак, что голосование на весь дом",
           "defaultValue": false,
           "type": Sequelize.BOOLEAN
@@ -1353,16 +1352,16 @@ var migrationCommands = [
     ]
   },
 
-  // addIndex imChannels house
+  // addIndex imChannels allHouse
   {
     fn: "addIndex",
     params: [
       "imChannels",
       [{
-        "name": "house"
+        "name": "allHouse"
       }],
       {
-        "indexName": "im_channels_house"
+        "indexName": "im_channels_all_house"
       }
     ]
   },

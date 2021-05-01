@@ -32,7 +32,7 @@ export default class Vote extends Model<Vote> {
   @Column({
     comment: "Признак, что голосование на весь дом"
   })
-  house: boolean;
+  allHouse: boolean;
 
   @Column({
     comment: "Если указана секция, то голосование на конкретную секция, либо этаж конкретной секции, если еще и этаж указан"
