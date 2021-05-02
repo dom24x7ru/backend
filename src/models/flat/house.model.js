@@ -69,6 +69,18 @@ __decorate([
     sequelize_typescript_1.HasMany(() => __1.IMChannel),
     __metadata("design:type", Array)
 ], House.prototype, "imChannels", void 0);
+__decorate([
+    sequelize_typescript_1.HasMany(() => __1.Instruction),
+    __metadata("design:type", Array)
+], House.prototype, "instructions", void 0);
+__decorate([
+    sequelize_typescript_1.HasMany(() => __1.RecommendationCategory),
+    __metadata("design:type", Array)
+], House.prototype, "recommendationCategories", void 0);
+__decorate([
+    sequelize_typescript_1.HasMany(() => __1.Vote),
+    __metadata("design:type", Array)
+], House.prototype, "votes", void 0);
 House = __decorate([
     sequelize_typescript_1.Table({
         tableName: "houses",

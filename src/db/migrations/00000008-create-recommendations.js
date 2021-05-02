@@ -40,7 +40,6 @@ var migrationCommands = [
           "type": Sequelize.DATE
         },
         "name": {
-          "unique": true,
           "allowNull": false,
           "type": Sequelize.STRING
         }

@@ -14,7 +14,16 @@ const __1 = require("..");
 let RecommendationCategory = class RecommendationCategory extends sequelize_typescript_1.Model {
 };
 __decorate([
-    sequelize_typescript_1.Unique,
+    sequelize_typescript_1.Index,
+    sequelize_typescript_1.ForeignKey(() => __1.House),
+    sequelize_typescript_1.Column,
+    __metadata("design:type", Number)
+], RecommendationCategory.prototype, "houseId", void 0);
+__decorate([
+    sequelize_typescript_1.BelongsTo(() => __1.House),
+    __metadata("design:type", __1.House)
+], RecommendationCategory.prototype, "house", void 0);
+__decorate([
     sequelize_typescript_1.AllowNull(false),
     sequelize_typescript_1.Column,
     __metadata("design:type", String)

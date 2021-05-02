@@ -1,5 +1,5 @@
-import { AllowNull, Column, Default, HasMany, Model, Table, Unique } from "sequelize-typescript";
-import { Recommendation } from "..";
+import { AllowNull, BelongsTo, Column, Default, ForeignKey, HasMany, Index, Model, Table } from "sequelize-typescript";
+import { House, Recommendation } from "..";
 
 @Table({
   tableName: "recommendationCategories",
@@ -7,7 +7,14 @@ import { Recommendation } from "..";
 })
 export default class RecommendationCategory extends Model<RecommendationCategory> {
 
-  @Unique
+  @Index
+  @ForeignKey(() => House)
+  @Column
+  houseId: number;
+
+  @BelongsTo(() => House)
+  house: House;
+  
   @AllowNull(false)
   @Column
   name: string;

@@ -1,4 +1,5 @@
-import { AllowNull, Column, DataType, Model, Table } from "sequelize-typescript";
+import { AllowNull, BelongsTo, Column, DataType, ForeignKey, Index, Model, Table } from "sequelize-typescript";
+import { House } from "..";
 
 export interface iInstructionItem {
   id: number;
@@ -13,6 +14,14 @@ export interface iInstructionItem {
 })
 export default class Instruction extends Model<Instruction> {
 
+  @Index
+  @ForeignKey(() => House)
+  @Column
+  houseId: number;
+
+  @BelongsTo(() => House)
+  house: House;
+  
   @AllowNull(false)
   @Column
   title: string;

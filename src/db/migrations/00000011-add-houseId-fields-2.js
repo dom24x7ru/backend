@@ -5,32 +5,30 @@ var Sequelize = require('sequelize');
 /**
  * Actions summary:
  *
- * addColumn houseId to posts
- * addColumn houseId to documents
- * addColumn houseId to faqCategories
- * addColumn houseId to imChannels
+ * addColumn houseId to instructions
+ * addColumn houseId to recommendationCategories
+ * addColumn houseId to votes
  * 
- * addIndex "posts_houseId" to table "posts"
- * addIndex "documents_houseId" to table "documents"
- * addIndex "faq_categories_houseId" to table "faqCategories"
- * addIndex "im_channels_houseId" to table "imChannels"
+ * addIndex "instructions_houseId" to table "instructions"
+ * addIndex "recommendationCategories_houseId" to table "recommendationCategories"
+ * addIndex "votes_houseId" to table "votes"
  *
  **/
 
 var info = {
   "revision": 10,
-  "name": "add-houseId-fields",
-  "created": "2021-04-30T20:05:00.000Z",
+  "name": "add-houseId-fields-2",
+  "created": "2021-05-01T19:34:00.000Z",
   "comment": "Разделение всех ресурсов сервиса по домам"
 };
 
 var migrationCommands = [
 
-  // addColumn houseId to posts
+  // addColumn houseId to instructions
   {
     fn: "addColumn",
     params: [
-      "posts",
+      "instructions",
       "houseId",
       {
         "onDelete": "NO ACTION",
@@ -45,11 +43,11 @@ var migrationCommands = [
     ]
   },
 
-  // addColumn houseId to documents
+  // addColumn houseId to recommendationCategories
   {
     fn: "addColumn",
     params: [
-      "documents",
+      "recommendationCategories",
       "houseId",
       {
         "onDelete": "NO ACTION",
@@ -64,11 +62,11 @@ var migrationCommands = [
     ]
   },
 
-  // addColumn houseId to faqCategories
+  // addColumn houseId to votes
   {
     fn: "addColumn",
     params: [
-      "faqCategories",
+      "votes",
       "houseId",
       {
         "onDelete": "NO ACTION",
@@ -83,77 +81,44 @@ var migrationCommands = [
     ]
   },
 
-  // addColumn houseId to imChannels
-  {
-    fn: "addColumn",
-    params: [
-      "imChannels",
-      "houseId",
-      {
-        "onDelete": "NO ACTION",
-        "onUpdate": "CASCADE",
-        "references": {
-          "model": "houses",
-          "key": "id"
-        },
-        "allowNull": true,
-        "type": Sequelize.INTEGER
-      }
-    ]
-  },
-
-  // addIndex posts houseId
+  // addIndex instructions houseId
   {
     fn: "addIndex",
     params: [
-      "posts",
+      "instructions",
       [{
         "name": "houseId"
       }],
       {
-        "indexName": "posts_house_id"
+        "indexName": "instructions_house_id"
       }
     ]
   },
 
-  // addIndex documents houseId
+  // addIndex recommendationCategories houseId
   {
     fn: "addIndex",
     params: [
-      "documents",
+      "recommendationCategories",
       [{
         "name": "houseId"
       }],
       {
-        "indexName": "documents_house_id"
+        "indexName": "recommendationCategories_house_id"
       }
     ]
   },
 
-  // addIndex faqCategories houseId
+  // addIndex votes houseId
   {
     fn: "addIndex",
     params: [
-      "faqCategories",
+      "votes",
       [{
         "name": "houseId"
       }],
       {
-        "indexName": "faq_categories_house_id"
-      }
-    ]
-  },
-
-  // addIndex imChannels houseId
-  {
-    fn: "addIndex",
-    params: [
-      "imChannels",
-      [{
-        "name": "houseId"
-      }],
-      {
-        "indexName": "im_channels_house_id"
+        "indexName": "votes_house_id"
       }
     ]
   }
@@ -161,19 +126,15 @@ var migrationCommands = [
 
 var rollbackCommands = [{
   fn: "removeColumn",
-  params: ["posts", "houseId"]
+  params: ["instructions", "houseId"]
 },
 {
   fn: "removeColumn",
-  params: ["documents", "houseId"]
+  params: ["recommendationCategories", "houseId"]
 },
 {
   fn: "removeColumn",
-  params: ["faqCategories", "houseId"]
-},
-{
-  fn: "removeColumn",
-  params: ["imChannels", "houseId"]
+  params: ["votes", "houseId"]
 }];
 
 module.exports = {
