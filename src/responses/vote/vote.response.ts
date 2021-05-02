@@ -1,5 +1,5 @@
 import Cache from "../../lib/cache";
-import { Flat, Person, Resident, User, Vote, VoteAnswer, VotePerson, VoteQuestion } from "../../models";
+import { Flat, Person, Resident, Vote, VoteAnswer, VotePerson, VoteQuestion } from "../../models";
 import Response from "../response";
 
 type tQuestion = {
@@ -139,11 +139,11 @@ export default class VoteResponse extends Response {
   }
 
   static async seed(action, params, socket) {
-    if (socket.authToken == null) return [];
-    const user = await User.findByPk(socket.authToken.id);
-    if (user == null || user.banned || user.deleted) return [];
-    
-    return await VoteResponse.list(socket.authToken.id);
+    if (await Response.checkUser(socket.authToken)) {
+      return await VoteResponse.list(socket.authToken.id);
+    } else {
+      return [];
+    }
   }
 
   private static include() {

@@ -1,4 +1,4 @@
-import { Flat, IMChannel, IMChannelPerson, Person, Resident, User } from "../../models";
+import { Flat, IMChannel, IMChannelPerson, Person, Resident } from "../../models";
 import IMMessage, { tIMMessageBody } from "../../models/im/im.message.model";
 import Response from "../response";
 import { getPerson, tPerson } from "../type/person.type";
@@ -93,11 +93,11 @@ export default class IMChannelResponse extends Response {
   }
 
   static async seed(action, params, socket) {
-    if (socket.authToken == null) return [];
-    const user = await User.findByPk(socket.authToken.id);
-    if (user == null || user.banned || user.deleted) return [];
-    
-    return await IMChannelResponse.list(socket.authToken.id);
+    if (await Response.checkUser(socket.authToken)) {
+      return await IMChannelResponse.list(socket.authToken.id);
+    } else {
+      return [];
+    }
   }
 
   private static include() {

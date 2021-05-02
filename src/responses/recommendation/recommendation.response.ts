@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import { Flat, Person, Recommendation, RecommendationCategory, Resident } from "../../models";
 import { tRecommendationExtra } from "../../models/recommendation/recommendation.model";
 import Response from "../response";
@@ -40,14 +41,19 @@ export default class RecommendationResponse extends Response {
     return RecommendationResponse.create(item);
   }
 
-  static async list() {
-    const list = await Recommendation.findAll({ include: RecommendationResponse.include() });
+  static async list(userId: number) {
+    const houseId = await Response.getHouseId(userId);
+    const list = await Recommendation.findAll({ where: { houseId: { [Op.or]: [houseId, null] } }, include: RecommendationResponse.include() });
     if (list == null || list.length == 0) return [];
     return list.map(item => RecommendationResponse.create(item));
   }
 
   static async seed(action, params, socket) {
-    return await RecommendationResponse.list();
+    if (await Response.checkUser(socket.authToken)) {
+      return await RecommendationResponse.list(socket.authToken.id);
+    } else {
+      return [];
+    }
   }
 
   private static include() {

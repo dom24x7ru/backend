@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const models_1 = require("../../models");
 const response_1 = require("../response");
+const sequelize_1 = require("sequelize");
 class InstructionResponse extends response_1.default {
     constructor(model) {
         super(model.id);
@@ -21,9 +22,10 @@ class InstructionResponse extends response_1.default {
     static create(model) {
         return new InstructionResponse(model);
     }
-    static list() {
+    static list(userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const instructions = yield models_1.Instruction.findAll({ order: [["id", "desc"]] });
+            const houseId = yield response_1.default.getHouseId(userId);
+            const instructions = yield models_1.Instruction.findAll({ where: { houseId: { [sequelize_1.Op.or]: [houseId, null] } }, order: [["id", "desc"]] });
             if (instructions == null || instructions.length == 0)
                 return [];
             return instructions.map(instruction => InstructionResponse.create(instruction));
@@ -31,7 +33,12 @@ class InstructionResponse extends response_1.default {
     }
     static seed(action, params, socket) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield InstructionResponse.list();
+            if (yield response_1.default.checkUser(socket.authToken)) {
+                return yield InstructionResponse.list(socket.authToken.id);
+            }
+            else {
+                return [];
+            }
         });
     }
 }

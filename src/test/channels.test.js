@@ -13,7 +13,7 @@ const responses_1 = require("../responses");
 (() => __awaiter(void 0, void 0, void 0, function* () {
     try {
         console.time("channels.test");
-        const result = yield responses_1.RecommendationResponse.list();
+        const result = yield responses_1.RecommendationResponse.list(1);
         console.log(result);
         console.timeEnd("channels.test");
     }

@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const sequelize_1 = require("sequelize");
 const models_1 = require("../../models");
 const response_1 = require("../response");
 class PostResponse extends response_1.default {
@@ -31,13 +32,10 @@ class PostResponse extends response_1.default {
             return PostResponse.create(post);
         });
     }
-    static list(filter = "unpinned") {
+    static list(userId, filter = "unpinned") {
         return __awaiter(this, void 0, void 0, function* () {
-            let where = {};
-            if (filter == "unpinned")
-                where = { pin: false };
-            else if (filter == "pinned")
-                where = { pin: true };
+            const houseId = yield response_1.default.getHouseId(userId);
+            const where = { houseId: { [sequelize_1.Op.or]: [houseId, null] }, pin: filter == "pinned" };
             const posts = yield models_1.Post.findAll({ where, order: [["id", "desc"]] });
             if (posts == null || posts.length == 0)
                 return [];
@@ -46,10 +44,15 @@ class PostResponse extends response_1.default {
     }
     static seed(action, params, socket) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (action == "LIST")
-                return yield PostResponse.list();
-            if (action == "PINNED")
-                return yield PostResponse.list("pinned");
+            if (yield response_1.default.checkUser(socket.authToken)) {
+                if (action == "LIST")
+                    return yield PostResponse.list(socket.authToken.id);
+                if (action == "PINNED")
+                    return yield PostResponse.list(socket.authToken.id, "pinned");
+            }
+            else {
+                return [];
+            }
         });
     }
 }

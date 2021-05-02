@@ -118,12 +118,12 @@ class VoteResponse extends response_1.default {
     }
     static seed(action, params, socket) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (socket.authToken == null)
+            if (yield response_1.default.checkUser(socket.authToken)) {
+                return yield VoteResponse.list(socket.authToken.id);
+            }
+            else {
                 return [];
-            const user = yield models_1.User.findByPk(socket.authToken.id);
-            if (user == null || user.banned || user.deleted)
-                return [];
-            return yield VoteResponse.list(socket.authToken.id);
+            }
         });
     }
     static include() {

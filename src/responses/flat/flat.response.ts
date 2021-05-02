@@ -44,16 +44,7 @@ export default class FlatResponse extends Response {
   }
 
   static async list(userId: number) {
-    const person = await Person.findOne({
-      where: { userId },
-      include: [
-        {
-          model: Resident,
-          include: [{ model: Flat }]
-        }
-      ]
-    });
-    const houseId = (person != null && person.residents.length != 0) ? person.residents[0].flat.houseId : 1;
+    const houseId = await Response.getHouseId(userId);
     const list = await Flat.findAll({
       where: { houseId },
       include: [{ model: Resident, include: [{ model: Person, include: [{ model: User }] }] }],
@@ -64,7 +55,10 @@ export default class FlatResponse extends Response {
   }
 
   static async seed(action, params, socket) {
-    if (socket.authToken == null) return [];
-    return await FlatResponse.list(socket.authToken.id);
+    if (await Response.checkUser(socket.authToken)) {
+      return await FlatResponse.list(socket.authToken.id);
+    } else {
+      return [];
+    }
   }
 }

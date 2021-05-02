@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const sequelize_1 = require("sequelize");
 const models_1 = require("../../models");
 const response_1 = require("../response");
 const person_type_1 = require("../type/person.type");
@@ -37,9 +38,10 @@ class RecommendationResponse extends response_1.default {
             return RecommendationResponse.create(item);
         });
     }
-    static list() {
+    static list(userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const list = yield models_1.Recommendation.findAll({ include: RecommendationResponse.include() });
+            const houseId = yield response_1.default.getHouseId(userId);
+            const list = yield models_1.Recommendation.findAll({ where: { houseId: { [sequelize_1.Op.or]: [houseId, null] } }, include: RecommendationResponse.include() });
             if (list == null || list.length == 0)
                 return [];
             return list.map(item => RecommendationResponse.create(item));
@@ -47,7 +49,12 @@ class RecommendationResponse extends response_1.default {
     }
     static seed(action, params, socket) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield RecommendationResponse.list();
+            if (yield response_1.default.checkUser(socket.authToken)) {
+                return yield RecommendationResponse.list(socket.authToken.id);
+            }
+            else {
+                return [];
+            }
         });
     }
     static include() {

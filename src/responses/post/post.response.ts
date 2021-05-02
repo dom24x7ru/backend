@@ -1,4 +1,4 @@
-import { WhereOptions } from "sequelize/types";
+import { Op, WhereOptions } from "sequelize";
 import { Post } from "../../models";
 import Response from "../response";
 
@@ -31,17 +31,20 @@ export default class PostResponse extends Response {
     return PostResponse.create(post);
   }
 
-  static async list(filter: tPostFilter = "unpinned") {
-    let where: WhereOptions = {};
-    if (filter == "unpinned") where = { pin: false };
-    else if (filter == "pinned") where = { pin: true };
+  static async list(userId: number, filter: tPostFilter = "unpinned") {
+    const houseId = await Response.getHouseId(userId);
+    const where: WhereOptions = { houseId: { [Op.or]: [houseId, null] }, pin: filter == "pinned" };
     const posts = await Post.findAll({ where, order: [["id", "desc"]] });
     if (posts == null || posts.length == 0) return [];
     return posts.map(post => PostResponse.create(post));
   }
 
   static async seed(action, params, socket) {
-    if (action == "LIST") return await PostResponse.list();
-    if (action == "PINNED") return await PostResponse.list("pinned");
+    if (await Response.checkUser(socket.authToken)) {
+      if (action == "LIST") return await PostResponse.list(socket.authToken.id);
+      if (action == "PINNED") return await PostResponse.list(socket.authToken.id, "pinned");
+    } else {
+      return [];
+    }
   }
 }

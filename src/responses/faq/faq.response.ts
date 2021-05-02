@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import { FAQCategory, FAQItem } from "../../models";
 import Response from "../response";
 
@@ -26,13 +27,18 @@ export default class FAQResponse extends Response {
     return new FAQResponse(model);
   }
 
-  static async list() {
-    const list = await FAQItem.findAll({ include: [{ model: FAQCategory }], order: [["id", "desc"]] });
+  static async list(userId: number) {
+    const houseId = await Response.getHouseId(userId);
+    const list = await FAQItem.findAll({ where: { houseId: { [Op.or]: [houseId, null] } }, include: [{ model: FAQCategory }], order: [["id", "desc"]] });
     if (list == null || list.length == 0) return [];
     return list.map(item => FAQResponse.create(item));
   }
 
   static async seed(action, params, socket) {
-    return await FAQResponse.list();
+    if (await Response.checkUser(socket.authToken)) {
+      return await FAQResponse.list(socket.authToken.id);
+    } else {
+      return [];
+    }
   }
 }
