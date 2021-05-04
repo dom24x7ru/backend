@@ -29,7 +29,7 @@ class FAQResponse extends response_1.default {
     static list(userId) {
         return __awaiter(this, void 0, void 0, function* () {
             const houseId = yield response_1.default.getHouseId(userId);
-            const list = yield models_1.FAQItem.findAll({ where: { houseId: { [sequelize_1.Op.or]: [houseId, null] } }, include: [{ model: models_1.FAQCategory }], order: [["id", "desc"]] });
+            const list = yield models_1.FAQItem.findAll({ include: [{ model: models_1.FAQCategory, where: { houseId: { [sequelize_1.Op.or]: [houseId, null] } } }], order: [["id", "desc"]] });
             if (list == null || list.length == 0)
                 return [];
             return list.map(item => FAQResponse.create(item));

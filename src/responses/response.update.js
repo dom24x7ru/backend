@@ -80,7 +80,7 @@ class ResponseUpdate {
     updateRecommendation(eventData) {
         return __awaiter(this, void 0, void 0, function* () {
             const recommendationId = eventData.data.recommendationId;
-            const recommendation = yield _1.RecommendationResponse.get(recommendationId);
+            const recommendation = yield _1.RecommendationResponse.get(eventData.userId, recommendationId);
             this.publish("recommendations", recommendation, eventData.data.event);
         });
     }

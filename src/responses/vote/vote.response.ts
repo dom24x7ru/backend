@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import Cache from "../../lib/cache";
 import { Flat, Person, Resident, Vote, VoteAnswer, VotePerson, VoteQuestion } from "../../models";
 import Response from "../response";
@@ -123,11 +124,13 @@ export default class VoteResponse extends Response {
     const person = await Person.findOne({ where: { userId } });
     if (person == null) return [];
 
+    const houseId = await Response.getHouseId(userId);
     const list = await VotePerson.findAll({
       where: { personId: person.id },
       include: [
         {
           model: Vote,
+          where: { houseId: { [Op.or]: [houseId, null] } },
           include: VoteResponse.include(),
         }
       ]

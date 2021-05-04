@@ -30,9 +30,10 @@ class RecommendationResponse extends response_1.default {
     static create(model) {
         return new RecommendationResponse(model);
     }
-    static get(recommendationId) {
+    static get(userId, recommendationId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const item = yield models_1.Recommendation.findByPk(recommendationId, { include: RecommendationResponse.include() });
+            const houseId = yield response_1.default.getHouseId(userId);
+            const item = yield models_1.Recommendation.findByPk(recommendationId, { include: RecommendationResponse.include(houseId) });
             if (item == null)
                 return null;
             return RecommendationResponse.create(item);
@@ -41,7 +42,7 @@ class RecommendationResponse extends response_1.default {
     static list(userId) {
         return __awaiter(this, void 0, void 0, function* () {
             const houseId = yield response_1.default.getHouseId(userId);
-            const list = yield models_1.Recommendation.findAll({ where: { houseId: { [sequelize_1.Op.or]: [houseId, null] } }, include: RecommendationResponse.include() });
+            const list = yield models_1.Recommendation.findAll({ include: RecommendationResponse.include(houseId) });
             if (list == null || list.length == 0)
                 return [];
             return list.map(item => RecommendationResponse.create(item));
@@ -57,10 +58,11 @@ class RecommendationResponse extends response_1.default {
             }
         });
     }
-    static include() {
+    static include(houseId) {
         return [
             {
-                model: models_1.RecommendationCategory
+                model: models_1.RecommendationCategory,
+                where: { houseId: { [sequelize_1.Op.or]: [houseId, null] } }
             },
             {
                 model: models_1.Person,

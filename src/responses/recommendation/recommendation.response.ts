@@ -35,15 +35,16 @@ export default class RecommendationResponse extends Response {
     return new RecommendationResponse(model);
   }
 
-  static async get(recommendationId: number) {
-    const item = await Recommendation.findByPk(recommendationId, { include: RecommendationResponse.include() })
+  static async get(userId: number, recommendationId: number) {
+    const houseId = await Response.getHouseId(userId);
+    const item = await Recommendation.findByPk(recommendationId, { include: RecommendationResponse.include(houseId) })
     if (item == null) return null;
     return RecommendationResponse.create(item);
   }
 
   static async list(userId: number) {
     const houseId = await Response.getHouseId(userId);
-    const list = await Recommendation.findAll({ where: { houseId: { [Op.or]: [houseId, null] } }, include: RecommendationResponse.include() });
+    const list = await Recommendation.findAll({ include: RecommendationResponse.include(houseId) });
     if (list == null || list.length == 0) return [];
     return list.map(item => RecommendationResponse.create(item));
   }
@@ -56,10 +57,11 @@ export default class RecommendationResponse extends Response {
     }
   }
 
-  private static include() {
+  private static include(houseId: number) {
     return [
       {
-        model: RecommendationCategory
+        model: RecommendationCategory,
+        where: { houseId: { [Op.or]: [houseId, null] } }
       },
       {
         model: Person,

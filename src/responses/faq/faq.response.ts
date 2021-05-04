@@ -29,7 +29,7 @@ export default class FAQResponse extends Response {
 
   static async list(userId: number) {
     const houseId = await Response.getHouseId(userId);
-    const list = await FAQItem.findAll({ where: { houseId: { [Op.or]: [houseId, null] } }, include: [{ model: FAQCategory }], order: [["id", "desc"]] });
+    const list = await FAQItem.findAll({ include: [{ model: FAQCategory, where: { houseId: { [Op.or]: [houseId, null] } } }], order: [["id", "desc"]] });
     if (list == null || list.length == 0) return [];
     return list.map(item => FAQResponse.create(item));
   }

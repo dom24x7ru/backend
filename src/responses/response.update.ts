@@ -71,7 +71,7 @@ export default class ResponseUpdate {
 
   private async updateRecommendation(eventData) {
     const recommendationId = eventData.data.recommendationId;
-    const recommendation = await RecommendationResponse.get(recommendationId);
+    const recommendation = await RecommendationResponse.get(eventData.userId, recommendationId);
     this.publish("recommendations", recommendation, eventData.data.event);
   }
 

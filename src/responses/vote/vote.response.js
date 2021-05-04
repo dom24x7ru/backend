@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const sequelize_1 = require("sequelize");
 const cache_1 = require("../../lib/cache");
 const models_1 = require("../../models");
 const response_1 = require("../response");
@@ -99,11 +100,13 @@ class VoteResponse extends response_1.default {
             const person = yield models_1.Person.findOne({ where: { userId } });
             if (person == null)
                 return [];
+            const houseId = yield response_1.default.getHouseId(userId);
             const list = yield models_1.VotePerson.findAll({
                 where: { personId: person.id },
                 include: [
                     {
                         model: models_1.Vote,
+                        where: { houseId: { [sequelize_1.Op.or]: [houseId, null] } },
                         include: VoteResponse.include(),
                     }
                 ]
