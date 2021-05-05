@@ -49,7 +49,7 @@ function auth({ mobile, invite, code }, respond) {
                 // формируем и отправляем одноразовый код авторизации по смс
                 user.smsCode = generateCode(4);
                 yield user.save();
-                yield smsc_1.default.send([mobile], user.smsCode);
+                yield smsc_1.default.send([mobile], `Ваш код: ${user.smsCode}`);
                 respond(null, { status: "OK" });
             }
             else {

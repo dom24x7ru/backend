@@ -32,7 +32,7 @@ export async function auth({ mobile, invite, code }, respond) {
       // формируем и отправляем одноразовый код авторизации по смс
       user.smsCode = generateCode(4);
       await user.save();
-      await SMSC.send([mobile], user.smsCode);
+      await SMSC.send([mobile], `Ваш код: ${user.smsCode}`);
 
       respond(null, { status: "OK" });
     } else {
