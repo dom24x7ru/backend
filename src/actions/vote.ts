@@ -21,7 +21,7 @@ export async function save({ title, questions, anonymous, multi, type }, respond
     const allHouse = type == "house";
     const section = type != "house" ? flat.section : null;
     const floor = type == "floor" ? flat.floor : null;
-    const vote = await Vote.create({ title, multi, anonymous, allHouse, section, floor, userId: this.authToken.id });
+    const vote = await Vote.create({ houseId: flat.houseId, title, multi, anonymous, allHouse, section, floor, userId: this.authToken.id });
 
     // добавляем вопросы к голосованию
     for (let question of questions) {
@@ -35,14 +35,19 @@ export async function save({ title, questions, anonymous, multi, type }, respond
     let residents: Resident[] = [];
     if (type == "house") {
       // весь дом
-      residents = await Resident.findAll({ include: [{ model: Person }] });
+      residents = await Resident.findAll({
+        include: [
+          { model: Person },
+          { model: Flat, where: { houseId: flat.houseId } }
+        ]
+      });
     } else if (type == "section") {
       // весь подъезд
-      const flats = await Flat.findAll({ where: { section } });
+      const flats = await Flat.findAll({ where: { houseId: flat.houseId, section } });
       residents = await Resident.findAll({ where: { flatId: flats.map(flat => flat.id) } });
     } else if (type == "floor") {
       // весь этаж в подъезде
-      const flats = await Flat.findAll({ where: { section, floor } });
+      const flats = await Flat.findAll({ where: { houseId: flat.houseId, section, floor } });
       residents = await Resident.findAll({ where: { flatId: flats.map(flat => flat.id) } });
     }
     for (let resident of residents) {

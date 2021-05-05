@@ -35,7 +35,7 @@ function save({ title, questions, anonymous, multi, type }, respond) {
             const allHouse = type == "house";
             const section = type != "house" ? flat.section : null;
             const floor = type == "floor" ? flat.floor : null;
-            const vote = yield models_1.Vote.create({ title, multi, anonymous, allHouse, section, floor, userId: this.authToken.id });
+            const vote = yield models_1.Vote.create({ houseId: flat.houseId, title, multi, anonymous, allHouse, section, floor, userId: this.authToken.id });
             // добавляем вопросы к голосованию
             for (let question of questions) {
                 const body = question.body;
@@ -47,16 +47,21 @@ function save({ title, questions, anonymous, multi, type }, respond) {
             let residents = [];
             if (type == "house") {
                 // весь дом
-                residents = yield models_1.Resident.findAll({ include: [{ model: models_1.Person }] });
+                residents = yield models_1.Resident.findAll({
+                    include: [
+                        { model: models_1.Person },
+                        { model: models_1.Flat, where: { houseId: flat.houseId } }
+                    ]
+                });
             }
             else if (type == "section") {
                 // весь подъезд
-                const flats = yield models_1.Flat.findAll({ where: { section } });
+                const flats = yield models_1.Flat.findAll({ where: { houseId: flat.houseId, section } });
                 residents = yield models_1.Resident.findAll({ where: { flatId: flats.map(flat => flat.id) } });
             }
             else if (type == "floor") {
                 // весь этаж в подъезде
-                const flats = yield models_1.Flat.findAll({ where: { section, floor } });
+                const flats = yield models_1.Flat.findAll({ where: { houseId: flat.houseId, section, floor } });
                 residents = yield models_1.Resident.findAll({ where: { flatId: flats.map(flat => flat.id) } });
             }
             for (let resident of residents) {
