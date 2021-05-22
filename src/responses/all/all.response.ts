@@ -33,6 +33,6 @@ export default class AllResponse extends Response {
 
   static async seed(action, params, socket) {
     if (socket.authToken == null) return null;
-    return await AllResponse.init(socket.authToken.id, params == null || params.length == 0 ? null : params);
+    return await AllResponse.init(socket.authToken.id, params == null || params.length == 0 ? null : params[0]);
   }
 }

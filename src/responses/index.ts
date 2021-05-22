@@ -24,7 +24,7 @@ const channels = {
     response: PingResponse
   },
   all: {
-    action: "INIT", // all.channelName
+    action: "INIT", // all.channelName.houseId
     response: AllResponse
   },
   house: {
