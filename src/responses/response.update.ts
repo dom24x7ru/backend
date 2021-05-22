@@ -1,5 +1,6 @@
 import { IMChannelResponse, IMMessageResponse, InviteResponse, PostResponse, RecommendationResponse, UserResponse, VoteResponse } from ".";
 import * as _ from "lodash";
+import Response from "./response";
 
 export type tPublishEvent = "create" | "update" | "destroy" | "ready";
 
@@ -55,7 +56,8 @@ export default class ResponseUpdate {
 
   private async updatePostSave(eventData) {
     const post = await PostResponse.get(eventData.data.postId);
-    this.publish("posts", post, eventData.data.event);
+    const houseId = await Response.getHouseId(eventData.userId);
+    this.publish(`posts.${houseId}`, post, eventData.data.event);
   }
 
   private async updateInviteSave(eventData) {
@@ -72,7 +74,8 @@ export default class ResponseUpdate {
   private async updateRecommendation(eventData) {
     const recommendationId = eventData.data.recommendationId;
     const recommendation = await RecommendationResponse.get(eventData.userId, recommendationId);
-    this.publish("recommendations", recommendation, eventData.data.event);
+    const houseId = await Response.getHouseId(eventData.userId);
+    this.publish(`recommendations.${houseId}`, recommendation, eventData.data.event);
   }
 
   private async updateIMMessage(eventData) {

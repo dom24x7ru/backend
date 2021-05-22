@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const _1 = require(".");
+const response_1 = require("./response");
 class ResponseUpdate {
     constructor(exchange) {
         this.exchange = exchange;
@@ -61,7 +62,8 @@ class ResponseUpdate {
     updatePostSave(eventData) {
         return __awaiter(this, void 0, void 0, function* () {
             const post = yield _1.PostResponse.get(eventData.data.postId);
-            this.publish("posts", post, eventData.data.event);
+            const houseId = yield response_1.default.getHouseId(eventData.userId);
+            this.publish(`posts.${houseId}`, post, eventData.data.event);
         });
     }
     updateInviteSave(eventData) {
@@ -81,7 +83,8 @@ class ResponseUpdate {
         return __awaiter(this, void 0, void 0, function* () {
             const recommendationId = eventData.data.recommendationId;
             const recommendation = yield _1.RecommendationResponse.get(eventData.userId, recommendationId);
-            this.publish("recommendations", recommendation, eventData.data.event);
+            const houseId = yield response_1.default.getHouseId(eventData.userId);
+            this.publish(`recommendations.${houseId}`, recommendation, eventData.data.event);
         });
     }
     updateIMMessage(eventData) {

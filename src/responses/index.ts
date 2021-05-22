@@ -32,7 +32,7 @@ const channels = {
     response: HouseResponse
   },
   flats: {
-    action: "LIST", // flats
+    action: "LIST", // flats.houseId
     response: FlatResponse
   },
   user: {
@@ -40,15 +40,15 @@ const channels = {
     response: UserResponse
   },
   posts: {
-    action: "LIST", // posts
+    action: "LIST", // posts.houseId
     response: PostResponse
   },
   pinnedPosts: {
-    action: "PINNED", // pinnedPosts
+    action: "PINNED", // pinnedPosts.houseId
     response: PostResponse
   },
   instructions: {
-    action: "LIST", // instructions
+    action: "LIST", // instructions.houseId
     response: InstructionResponse
   },
   invites: {
@@ -56,11 +56,11 @@ const channels = {
     response: InviteResponse
   },
   documents: {
-    action: "LIST", // documents
+    action: "LIST", // documents.houseId
     response: DocumentResponse
   },
   faq: {
-    action: "LIST", // faq
+    action: "LIST", // faq.houseId
     response: FAQResponse
   },
   votes: {
@@ -76,7 +76,7 @@ const channels = {
     response: IMChannelResponse
   },
   recommendations: {
-    action: "LIST", // recommendations
+    action: "LIST", // recommendations.houseId
     response: RecommendationResponse
   }
 }
