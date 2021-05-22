@@ -156,94 +156,10 @@ function saveProfile({ surname, name, midname, telegram, flat, access }, respond
             let resident = yield models_1.Resident.findOne({ where: { personId: person.id }, include: [{ model: models_1.Flat }] });
             if (resident == null) {
                 yield models_1.Resident.create({ personId: person.id, flatId: flat });
-                // проверяем активные голосования и, при необходимости, добавляем в нужные
-                try {
-                    const votes = yield models_1.Vote.findAll({ where: { closed: false } });
-                    if (votes != null) {
-                        for (let vote of votes) {
-                            if (vote.allHouse) {
-                                // голосование на весь дом
-                                const votePerson = yield models_1.VotePerson.findOne({ where: { voteId: vote.id, personId: person.id } });
-                                if (votePerson == null) {
-                                    models_1.VotePerson.create({ voteId: vote.id, personId: person.id });
-                                }
-                            }
-                            else {
-                                // голосование на подъезд, либо этаж
-                                if (resident.flat.section == vote.section) {
-                                    if (vote.floor != null) {
-                                        // голосование на этаж
-                                        if (resident.flat.floor == vote.floor) {
-                                            const votePerson = yield models_1.VotePerson.findOne({ where: { voteId: vote.id, personId: person.id } });
-                                            if (votePerson == null) {
-                                                models_1.VotePerson.create({ voteId: vote.id, personId: person.id });
-                                            }
-                                        }
-                                    }
-                                    else {
-                                        // голосование на подъезд
-                                        const votePerson = yield models_1.VotePerson.findOne({ where: { voteId: vote.id, personId: person.id } });
-                                        if (votePerson == null) {
-                                            models_1.VotePerson.create({ voteId: vote.id, personId: person.id });
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        cache_1.default.getInstance().clear("votes:*");
-                    }
-                }
-                catch (error) {
-                    console.error(error.message);
-                }
-                const responseUpdate = new response_update_1.default(this.exchange);
                 // добавляем пользователя в чаты
-                try {
-                    const flatDb = yield models_1.Flat.findByPk(flat);
-                    const flatTxt = `кв. ${flatDb.number}, этаж ${flatDb.floor}, подъезд ${flatDb.section}`;
-                    // в общедомовой
-                    let channel = yield models_1.IMChannel.findOne({ where: { allHouse: true } });
-                    models_1.IMChannelPerson.create({ channelId: channel.id, personId: person.id });
-                    models_1.IMMessage.create({ channelId: channel.id, body: { text: `Сосед(ка) из ${flatTxt} вступил(а) в группу` } });
-                    cache_1.default.getInstance().clear(`imMessages:${channel.id}`);
-                    // обновляем канал "imChannel"
-                    responseUpdate.update({
-                        userId: this.authToken.id,
-                        createAt: new Date(),
-                        type: "IM.CHANNEL.UPDATE",
-                        status: "SUCCESS",
-                        data: JSON.stringify({ channelId: channel.id, event: "update" })
-                    });
-                    // в чат секции
-                    channel = yield models_1.IMChannel.findOne({ where: { section: flatDb.section, floor: null } });
-                    models_1.IMChannelPerson.create({ channelId: channel.id, personId: person.id });
-                    models_1.IMMessage.create({ channelId: channel.id, body: { text: `Сосед(ка) из ${flatTxt} вступил(а) в группу` } });
-                    cache_1.default.getInstance().clear(`imMessages:${channel.id}`);
-                    // обновляем канал "imChannel"
-                    responseUpdate.update({
-                        userId: this.authToken.id,
-                        createAt: new Date(),
-                        type: "IM.CHANNEL.UPDATE",
-                        status: "SUCCESS",
-                        data: JSON.stringify({ channelId: channel.id, event: "update" })
-                    });
-                    // в чат этажа
-                    channel = yield models_1.IMChannel.findOne({ where: { section: flatDb.section, floor: flatDb.floor } });
-                    models_1.IMChannelPerson.create({ channelId: channel.id, personId: person.id });
-                    models_1.IMMessage.create({ channelId: channel.id, body: { text: `Сосед(ка) из ${flatTxt} вступил(а) в группу` } });
-                    cache_1.default.getInstance().clear(`imMessages:${channel.id}`);
-                    // обновляем канал "imChannel"
-                    responseUpdate.update({
-                        userId: this.authToken.id,
-                        createAt: new Date(),
-                        type: "IM.CHANNEL.UPDATE",
-                        status: "SUCCESS",
-                        data: JSON.stringify({ channelId: channel.id, event: "update" })
-                    });
-                }
-                catch (error) {
-                    console.error(error.message);
-                }
+                yield attachChats(flat, person);
+                // проверяем активные голосования и, при необходимости, добавляем в нужные
+                yield attachVotes(person);
                 // генерируем новость, что у нас новый сосед
                 const post = yield models_1.Post.create({
                     title: "Новый сосед",
@@ -254,6 +170,7 @@ function saveProfile({ surname, name, midname, telegram, flat, access }, respond
                 });
                 // отправляем нотификацию всем соседям
                 push_1.default.send({ body: post.body, uri: post.url, all: true });
+                const responseUpdate = new response_update_1.default(this.exchange);
                 // обновляем канал "posts"
                 responseUpdate.update({
                     userId: this.authToken.id,
@@ -262,7 +179,6 @@ function saveProfile({ surname, name, midname, telegram, flat, access }, respond
                     status: "SUCCESS",
                     data: JSON.stringify({ postId: post.id, event: "create" })
                 });
-                resident = yield models_1.Resident.findOne({ where: { personId: person.id }, include: [{ model: models_1.Flat }] });
                 // обновляем канал "invites"
                 const inviteDb = yield models_1.Invite.findOne({ where: { newUserId: this.authToken.id } });
                 responseUpdate.update({
@@ -283,6 +199,101 @@ function saveProfile({ surname, name, midname, telegram, flat, access }, respond
     });
 }
 exports.saveProfile = saveProfile;
+function attachChats(flatId, person) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const responseUpdate = new response_update_1.default(this.exchange);
+            const flatDb = yield models_1.Flat.findByPk(flatId);
+            const flatTxt = `кв. ${flatDb.number}, этаж ${flatDb.floor}, подъезд ${flatDb.section}`;
+            // в общедомовой
+            let channel = yield models_1.IMChannel.findOne({ where: { houseId: flatDb.houseId, allHouse: true } });
+            models_1.IMChannelPerson.create({ channelId: channel.id, personId: person.id });
+            models_1.IMMessage.create({ channelId: channel.id, body: { text: `Сосед(ка) из ${flatTxt} вступил(а) в группу` } });
+            cache_1.default.getInstance().clear(`imMessages:${channel.id}`);
+            // обновляем канал "imChannel"
+            responseUpdate.update({
+                userId: this.authToken.id,
+                createAt: new Date(),
+                type: "IM.CHANNEL.UPDATE",
+                status: "SUCCESS",
+                data: JSON.stringify({ channelId: channel.id, event: "update" })
+            });
+            // в чат секции
+            channel = yield models_1.IMChannel.findOne({ where: { houseId: flatDb.houseId, section: flatDb.section, floor: null } });
+            models_1.IMChannelPerson.create({ channelId: channel.id, personId: person.id });
+            models_1.IMMessage.create({ channelId: channel.id, body: { text: `Сосед(ка) из ${flatTxt} вступил(а) в группу` } });
+            cache_1.default.getInstance().clear(`imMessages:${channel.id}`);
+            // обновляем канал "imChannel"
+            responseUpdate.update({
+                userId: this.authToken.id,
+                createAt: new Date(),
+                type: "IM.CHANNEL.UPDATE",
+                status: "SUCCESS",
+                data: JSON.stringify({ channelId: channel.id, event: "update" })
+            });
+            // в чат этажа
+            channel = yield models_1.IMChannel.findOne({ where: { houseId: flatDb.houseId, section: flatDb.section, floor: flatDb.floor } });
+            models_1.IMChannelPerson.create({ channelId: channel.id, personId: person.id });
+            models_1.IMMessage.create({ channelId: channel.id, body: { text: `Сосед(ка) из ${flatTxt} вступил(а) в группу` } });
+            cache_1.default.getInstance().clear(`imMessages:${channel.id}`);
+            // обновляем канал "imChannel"
+            responseUpdate.update({
+                userId: this.authToken.id,
+                createAt: new Date(),
+                type: "IM.CHANNEL.UPDATE",
+                status: "SUCCESS",
+                data: JSON.stringify({ channelId: channel.id, event: "update" })
+            });
+        }
+        catch (error) {
+            console.error(error.message);
+        }
+    });
+}
+function attachVotes(person) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const resident = yield models_1.Resident.findOne({ where: { personId: person.id }, include: [{ model: models_1.Flat }] });
+            const votes = yield models_1.Vote.findAll({ where: { houseId: resident.flat.houseId, closed: false } });
+            if (votes != null) {
+                for (let vote of votes) {
+                    if (vote.allHouse) {
+                        // голосование на весь дом
+                        const votePerson = yield models_1.VotePerson.findOne({ where: { voteId: vote.id, personId: person.id } });
+                        if (votePerson == null) {
+                            models_1.VotePerson.create({ voteId: vote.id, personId: person.id });
+                        }
+                    }
+                    else {
+                        // голосование на подъезд, либо этаж
+                        if (resident.flat.section == vote.section) {
+                            if (vote.floor != null) {
+                                // голосование на этаж
+                                if (resident.flat.floor == vote.floor) {
+                                    const votePerson = yield models_1.VotePerson.findOne({ where: { voteId: vote.id, personId: person.id } });
+                                    if (votePerson == null) {
+                                        models_1.VotePerson.create({ voteId: vote.id, personId: person.id });
+                                    }
+                                }
+                            }
+                            else {
+                                // голосование на подъезд
+                                const votePerson = yield models_1.VotePerson.findOne({ where: { voteId: vote.id, personId: person.id } });
+                                if (votePerson == null) {
+                                    models_1.VotePerson.create({ voteId: vote.id, personId: person.id });
+                                }
+                            }
+                        }
+                    }
+                }
+                cache_1.default.getInstance().clear("votes:*");
+            }
+        }
+        catch (error) {
+            console.error(error.message);
+        }
+    });
+}
 function generateCode(len) {
     return numeral(parseInt("9".repeat(len)) * Math.random()).format("0".repeat(len));
 }

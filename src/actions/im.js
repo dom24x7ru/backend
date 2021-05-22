@@ -269,7 +269,8 @@ function createPrivateChannel({ personId }, respond) {
             });
             let channel = yield getPrivateChannel([person.id, personId]);
             if (channel == null) {
-                channel = yield models_1.IMChannel.create({ private: true });
+                const resident = yield models_1.Resident.findOne({ where: { personId: person.id }, include: [{ model: models_1.Flat }] });
+                channel = yield models_1.IMChannel.create({ houseId: resident.flat.houseId, private: true });
                 models_1.IMChannelPerson.create({ channelId: channel.id, personId: person.id });
                 models_1.IMChannelPerson.create({ channelId: channel.id, personId });
                 // обновляем канал "imChannel"

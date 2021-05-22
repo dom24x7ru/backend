@@ -1,6 +1,6 @@
 import Cache from "../lib/cache";
 import Push from "../lib/push";
-import { IMChannel, IMChannelPerson, IMMessage, IMMessageShow, NotificationToken, Person, User } from "../models";
+import { Flat, IMChannel, IMChannelPerson, IMMessage, IMMessageShow, NotificationToken, Person, Resident, User } from "../models";
 import { IMMessageResponse } from "../responses";
 import ResponseUpdate from "../responses/response.update";
 import errors from "./errors";
@@ -229,9 +229,11 @@ export async function createPrivateChannel({ personId }, respond) {
       }
       return null;
     };
+
     let channel: IMChannel = await getPrivateChannel([person.id, personId]);
     if (channel == null) {
-      channel = await IMChannel.create({ private: true });
+      const resident = await Resident.findOne({ where: { personId: person.id }, include: [{ model: Flat }] });
+      channel = await IMChannel.create({ houseId: resident.flat.houseId, private: true });
       IMChannelPerson.create({ channelId: channel.id, personId: person.id });
       IMChannelPerson.create({ channelId: channel.id, personId });
 
