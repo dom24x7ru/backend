@@ -221,6 +221,7 @@ export async function saveProfile({ surname, name, midname, telegram, flat, acce
         type: "person",
         body: `К нам присоединился новый сосед с кв. №${flatDb.number}, этаж ${flatDb.floor}, подъезд ${flatDb.section}`,
         url: `/flat/${flatDb.number}`,
+        houseId: flatDb.houseId
       });
       // отправляем нотификацию всем соседям
       Push.send({ body: post.body, uri: post.url, all: true });

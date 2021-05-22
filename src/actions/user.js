@@ -250,6 +250,7 @@ function saveProfile({ surname, name, midname, telegram, flat, access }, respond
                     type: "person",
                     body: `К нам присоединился новый сосед с кв. №${flatDb.number}, этаж ${flatDb.floor}, подъезд ${flatDb.section}`,
                     url: `/flat/${flatDb.number}`,
+                    houseId: flatDb.houseId
                 });
                 // отправляем нотификацию всем соседям
                 push_1.default.send({ body: post.body, uri: post.url, all: true });
