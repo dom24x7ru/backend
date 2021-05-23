@@ -40,7 +40,7 @@ class AllResponse extends response_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             if (socket.authToken == null)
                 return null;
-            return yield AllResponse.init(socket.authToken.id, params == null || params.length == 0 ? null : params[0]);
+            return yield AllResponse.init(socket.authToken.id, params == null || params.length < 2 ? null : params[1]);
         });
     }
 }
