@@ -19,11 +19,16 @@ const models_1 = require("../models");
         let house = yield models_1.House.findOne({ where: { address } });
         if (house == null) {
             house = yield models_1.House.create({ address });
+            console.log(`>>> дом по адресу ${address} добавлено`);
+        }
+        else {
+            console.log(`>>> дом по адресу ${address} ранее уже было добавлено`);
         }
         house.dadata = yield dadata_1.default.address(address);
         house.lat = 55.913096;
         house.lon = 37.715246;
         yield house.save();
+        console.log(`>>> обновлены данные по дому`);
         // загружаем квартиры
         const flatsData = fs.readFileSync(`${__dirname}/u10.csv`, "utf8");
         const flatsArr = flatsData.split("\r\n");
@@ -42,6 +47,31 @@ const models_1 = require("../models");
                 console.log(`>>> загружаем данные по квартире № ${flatItem.number}`);
                 flat = yield models_1.Flat.create(flatItem);
             }
+            else {
+                console.log(`>>> данные по квартире № ${flatItem.number} ранее уже были добавлены`);
+            }
+        }
+        // === создаем чаты для дома ===
+        yield createChannel(house.id, "Общедомовой", true);
+        // для формирования чатов секций и этажей сформируюем удобную структуру квартир в доме
+        const flatsDB = yield models_1.Flat.findAll({ where: { houseId: house.id } });
+        let flats = {};
+        for (let flat of flatsDB) {
+            if (flats[flat.section] == null)
+                flats[flat.section] = {};
+            if (flats[flat.section][flat.floor] == null)
+                flats[flat.section][flat.floor] = [];
+            flats[flat.section][flat.floor].push(flat);
+        }
+        for (let section in flats) {
+            // чат секции
+            yield createChannel(house.id, `Секция №${section}`, false, parseInt(section));
+            for (let floor in flats[section]) {
+                if (flats[section][floor].length > 1) {
+                    // чат этажа в секции
+                    yield createChannel(house.id, `Этаж ${floor} в секции ${section}`, false, parseInt(section), parseInt(floor));
+                }
+            }
         }
         console.log("Завершение процесса");
     }
@@ -52,3 +82,57 @@ const models_1 = require("../models");
         process.exit(0);
     }
 }))();
+function createChannel(houseId, title, allHouse, section = null, floor = null) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let channel;
+        if (allHouse) {
+            channel = yield models_1.IMChannel.findOne({ where: { houseId, allHouse } });
+        }
+        else {
+            channel = yield models_1.IMChannel.findOne({ where: { houseId, section, floor: floor } });
+        }
+        if (channel == null) {
+            // новая еще не созданная группа
+            console.log(`>>> создаем группу "${title}"`);
+            channel = yield models_1.IMChannel.create({ houseId, title, allHouse, section, floor });
+            // сразу для него генерируем системное сообщение
+            yield models_1.IMMessage.create({ channelId: channel.id, body: { text: `Создана группа "${title}"` } });
+        }
+        else {
+            console.log(`>>> ранее созданная группа группу "${title}"`);
+        }
+        // теперь подключаем всех необходимых пользователей
+        console.log(`    >>> добавляем новах пользователей в группу`);
+        let residents = [];
+        if (allHouse) {
+            // весь дом
+            residents = yield models_1.Resident.findAll({ include: [{ model: models_1.Flat, where: { houseId } }] });
+        }
+        else {
+            let flats = [];
+            if (floor != null) {
+                // группа по этажу
+                flats = yield models_1.Flat.findAll({ where: { houseId, section, floor } });
+            }
+            else {
+                // группа по секции
+                flats = yield models_1.Flat.findAll({ where: { houseId, section } });
+            }
+            residents = yield models_1.Resident.findAll({ where: { flatId: flats.map(flat => flat.id) }, include: [{ model: models_1.Flat }] });
+        }
+        for (let resident of residents) {
+            const channelPerson = yield models_1.IMChannelPerson.findOne({ where: { channelId: channel.id, personId: resident.personId } });
+            if (channelPerson == null) {
+                console.log(`        добавляем пользователя ${resident.personId}`);
+                yield models_1.IMChannelPerson.create({ channelId: channel.id, personId: resident.personId });
+                const flat = resident.flat;
+                const flatTxt = `кв. ${flat.number}, этаж ${flat.floor}, подъезд ${flat.section}`;
+                yield models_1.IMMessage.create({ channelId: channel.id, body: { text: `Сосед(ка) из ${flatTxt} вступил(а) в группу` } });
+            }
+            else {
+                console.log(`        ранее добавленный пользователь ${resident.personId}`);
+            }
+        }
+        console.log(`    завершили генерацию группы "${title}"`);
+    });
+}
