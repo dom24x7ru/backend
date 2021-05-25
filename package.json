@@ -44,9 +44,10 @@
     "xmlbuilder": "^13.0.2"
   },
   "devDependencies": {
+    "@types/jest": "^26.0.23",
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.7.0",
-    "jest": "^24.8.0",
+    "jest": "^27.0.1",
     "sequelize-typescript-migration": "0.0.1-beta.3"
   },
   "keywords": [
@@ -61,7 +62,7 @@
     "start": "babel-node server.js",
     "dev": "tsc && babel-node server.js",
     "init": "tsc && babel-node ./src/init/dom24x7.init.js",
-    "test": "tsc && babel-node ./src/test/channels.test.js",
+    "test": "tsc && jest",
     "migration": "tsc && babel-node ./src/makeMigration.js"
   }
 }
