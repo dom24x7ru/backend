@@ -7,6 +7,7 @@ type tQuestion = {
   id: number,
   body?: string
 };
+// TODO: перевести на стандартный тип tPerson
 type tPerson = {
   id: number,
   surname?: string,

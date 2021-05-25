@@ -8,7 +8,7 @@ export default class IMMessageResponse extends Response {
 
   createdAt: number;
   updatedAt: number;
-  person: tPerson
+  person: tPerson;
   channel: {
     id: number,
     title: string,
