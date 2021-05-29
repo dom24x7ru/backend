@@ -1,24 +1,12 @@
 import { Op } from "sequelize";
 import Cache from "../../lib/cache";
 import { Flat, Person, Resident, Vote, VoteAnswer, VotePerson, VoteQuestion } from "../../models";
+import { getPerson, tPerson } from "../type/person.type";
 import Response from "../response";
 
 type tQuestion = {
   id: number,
   body?: string
-};
-// TODO: перевести на стандартный тип tPerson
-type tPerson = {
-  id: number,
-  surname?: string,
-  name?: string,
-  midname?: string,
-  flat?: {
-    id: number,
-    number: number,
-    section: number,
-    floor: number
-  }
 };
 type tAnswer = {
   id: number,
@@ -68,37 +56,10 @@ export default class VoteResponse extends Response {
         }
       }
       // дальше только для неанонимного голосования
-      let flat = null;
-      if (answer.person.residents.length > 0) {
-        const flatInfo = answer.person.residents[0].flat;
-        flat = {
-          id: flatInfo.id,
-          number: flatInfo.number,
-          section: flatInfo.section,
-          floor: flatInfo.floor
-        };
-      }
-      let person = {
-        id: answer.personId,
-        surname: null,
-        name: null,
-        midname: null,
-        flat
-      };
-      const access = answer.person.access;
-      if (access.name.level == "all") {
-        if (access.name.format == "all") {
-          person.surname = answer.person.surname;
-          person.name = answer.person.name;
-          person.midname = answer.person.midname;
-        } else if (access.name.format == "name") {
-          person.name = answer.person.name;
-        }
-      }
       return {
         id: answer.id,
         question: { id: answer.questionId },
-        person
+        person: getPerson(answer.person)
       };
     });
   }

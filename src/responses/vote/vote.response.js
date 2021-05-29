@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_1 = require("sequelize");
 const cache_1 = require("../../lib/cache");
 const models_1 = require("../../models");
+const person_type_1 = require("../type/person.type");
 const response_1 = require("../response");
 class VoteResponse extends response_1.default {
     constructor(model) {
@@ -42,38 +43,10 @@ class VoteResponse extends response_1.default {
                 };
             }
             // дальше только для неанонимного голосования
-            let flat = null;
-            if (answer.person.residents.length > 0) {
-                const flatInfo = answer.person.residents[0].flat;
-                flat = {
-                    id: flatInfo.id,
-                    number: flatInfo.number,
-                    section: flatInfo.section,
-                    floor: flatInfo.floor
-                };
-            }
-            let person = {
-                id: answer.personId,
-                surname: null,
-                name: null,
-                midname: null,
-                flat
-            };
-            const access = answer.person.access;
-            if (access.name.level == "all") {
-                if (access.name.format == "all") {
-                    person.surname = answer.person.surname;
-                    person.name = answer.person.name;
-                    person.midname = answer.person.midname;
-                }
-                else if (access.name.format == "name") {
-                    person.name = answer.person.name;
-                }
-            }
             return {
                 id: answer.id,
                 question: { id: answer.questionId },
-                person
+                person: person_type_1.getPerson(answer.person)
             };
         });
     }

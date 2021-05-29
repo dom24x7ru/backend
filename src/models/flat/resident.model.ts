@@ -3,7 +3,7 @@ import { Flat, Person } from "..";
 
 @Table({
   tableName: "residents",
-  comment: "Связка пользователей с квартирави, которые у них в собственности, либо они в них живут"
+  comment: "Связка пользователей с квартирами, которые у них в собственности, либо они в них живут"
 })
 export default class Resident extends Model<Resident> {
 

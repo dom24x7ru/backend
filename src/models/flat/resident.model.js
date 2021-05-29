@@ -41,7 +41,7 @@ __decorate([
 Resident = __decorate([
     sequelize_typescript_1.Table({
         tableName: "residents",
-        comment: "Связка пользователей с квартирави, которые у них в собственности, либо они в них живут"
+        comment: "Связка пользователей с квартирами, которые у них в собственности, либо они в них живут"
     })
 ], Resident);
 exports.default = Resident;
