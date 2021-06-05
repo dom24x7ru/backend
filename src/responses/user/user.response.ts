@@ -1,5 +1,5 @@
 import Response from "../response";
-import { Flat, Person, Resident, Role, User } from "../../models";
+import { Flat, Invite, Person, Resident, Role, User } from "../../models";
 import { DEFAULT_ACCESS } from "../../models/person/person.model";
 import Cache from "../../lib/cache";
 
@@ -8,6 +8,7 @@ export default class UserResponse extends Response {
   mobile: string;
   banned: boolean;
   role: { id: number, name: string, };
+  houseId: number;
   person: Person;
   resident: Resident;
   
@@ -34,6 +35,34 @@ export default class UserResponse extends Response {
     token.role = { id: role.id, name: role.name };
     token.person = person;
     token.resident = resident;
+
+    if (token.resident != null) {
+      // уже полностью сформированная учетная запись с привязкой к квартире
+      token.houseId = token.resident.flat.houseId;
+    } else {
+      // новый пользователь, нужно взять данные у пригласившего пользователя
+      const invite = await Invite.findOne({
+        where: { newUserId: token.id },
+        include: [
+          {
+            model: User,
+            as: "user",
+            include: [
+              {
+                model: Person,
+                include: [
+                  {
+                    model: Resident,
+                    include: [{ model: Flat }]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      });
+      token.houseId = invite.user.person.residents[0].flat.houseId;
+    }
 
     return token;
   }

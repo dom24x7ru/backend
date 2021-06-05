@@ -35,6 +35,34 @@ class UserResponse extends response_1.default {
             token.role = { id: role.id, name: role.name };
             token.person = person;
             token.resident = resident;
+            if (token.resident != null) {
+                // уже полностью сформированная учетная запись с привязкой к квартире
+                token.houseId = token.resident.flat.houseId;
+            }
+            else {
+                // новый пользователь, нужно взять данные у пригласившего пользователя
+                const invite = yield models_1.Invite.findOne({
+                    where: { newUserId: token.id },
+                    include: [
+                        {
+                            model: models_1.User,
+                            as: "user",
+                            include: [
+                                {
+                                    model: models_1.Person,
+                                    include: [
+                                        {
+                                            model: models_1.Resident,
+                                            include: [{ model: models_1.Flat }]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                });
+                token.houseId = invite.user.person.residents[0].flat.houseId;
+            }
             return token;
         });
     }

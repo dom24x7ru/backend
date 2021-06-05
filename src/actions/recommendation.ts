@@ -1,4 +1,4 @@
-import { Person, Recommendation, RecommendationCategory, User } from "../models";
+import { Flat, Person, Recommendation, RecommendationCategory, Resident, User } from "../models";
 import ResponseUpdate from "../responses/response.update";
 import errors from "./errors";
 import * as fs from "fs";
@@ -85,7 +85,14 @@ export async function save({ id, categoryId, title, body, extra, files }, respon
 export async function categories(params, respond) {
   console.log(">>>>> actions/recommendation.categories");
   try {
-    const categories = await RecommendationCategory.findAll({ order: [["sort", "asc"]] });
+    if (!this.authToken) throw new Error(errors.user["004"].code);
+    const user = await User.findByPk(this.authToken.id);
+    if (user == null) throw new Error(errors.user["003"].code);
+    if (user.banned) throw new Error(errors.user["002"].code);
+    if (user.deleted) throw new Error(errors.user["003"].code);
+
+    const houseId = await getHouseId(this.authToken.id);
+    const categories = await RecommendationCategory.findAll({ where: { houseId }, order: [["sort", "asc"]] });
     respond(null, categories.map(item => {
       return { id: item.id, name: item.name };
     }));
@@ -108,4 +115,17 @@ function saveFile(file: tFile, person: Person) {
   } catch (error) {
     console.error(error);
   }
+}
+
+async function getHouseId(userId: number): Promise<number> {
+  const person = await Person.findOne({
+    where: { userId },
+    include: [
+      {
+        model: Resident,
+        include: [{ model: Flat }]
+      }
+    ]
+  });
+  return (person != null && person.residents.length != 0) ? person.residents[0].flat.houseId : 1;
 }

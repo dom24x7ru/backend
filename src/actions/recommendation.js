@@ -95,7 +95,17 @@ function categories(params, respond) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log(">>>>> actions/recommendation.categories");
         try {
-            const categories = yield models_1.RecommendationCategory.findAll({ order: [["sort", "asc"]] });
+            if (!this.authToken)
+                throw new Error(errors_1.default.user["004"].code);
+            const user = yield models_1.User.findByPk(this.authToken.id);
+            if (user == null)
+                throw new Error(errors_1.default.user["003"].code);
+            if (user.banned)
+                throw new Error(errors_1.default.user["002"].code);
+            if (user.deleted)
+                throw new Error(errors_1.default.user["003"].code);
+            const houseId = yield getHouseId(this.authToken.id);
+            const categories = yield models_1.RecommendationCategory.findAll({ where: { houseId }, order: [["sort", "asc"]] });
             respond(null, categories.map(item => {
                 return { id: item.id, name: item.name };
             }));
@@ -122,4 +132,18 @@ function saveFile(file, person) {
     catch (error) {
         console.error(error);
     }
+}
+function getHouseId(userId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const person = yield models_1.Person.findOne({
+            where: { userId },
+            include: [
+                {
+                    model: models_1.Resident,
+                    include: [{ model: models_1.Flat }]
+                }
+            ]
+        });
+        return (person != null && person.residents.length != 0) ? person.residents[0].flat.houseId : 1;
+    });
 }
