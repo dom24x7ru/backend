@@ -26,7 +26,8 @@ function info({ flatNumber }, respond) {
                 throw new Error(errors_1.default.user["002"].code);
             if (user.deleted)
                 throw new Error(errors_1.default.user["003"].code);
-            const flat = yield models_1.Flat.findOne({ where: { number: flatNumber } });
+            const houseId = yield getHouseId(this.authToken.id);
+            const flat = yield models_1.Flat.findOne({ where: { houseId, number: flatNumber } });
             if (flat == null)
                 throw new Error(errors_1.default.flat["001"].code);
             const residents = yield models_1.Resident.findAll({ where: { flatId: flat.id }, include: [{ model: models_1.Person, include: [{ model: models_1.User }] }] });
@@ -66,3 +67,17 @@ function info({ flatNumber }, respond) {
     });
 }
 exports.info = info;
+function getHouseId(userId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const person = yield models_1.Person.findOne({
+            where: { userId },
+            include: [
+                {
+                    model: models_1.Resident,
+                    include: [{ model: models_1.Flat }]
+                }
+            ]
+        });
+        return (person != null && person.residents.length != 0) ? person.residents[0].flat.houseId : 1;
+    });
+}

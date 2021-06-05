@@ -11,7 +11,8 @@ export async function info({ flatNumber }, respond) {
     if (user.banned) throw new Error(errors.user["002"].code);
     if (user.deleted) throw new Error(errors.user["003"].code);
 
-    const flat = await Flat.findOne({ where: { number: flatNumber } });
+    const houseId = await getHouseId(this.authToken.id);
+    const flat = await Flat.findOne({ where: { houseId, number: flatNumber } });
     if (flat == null) throw new Error(errors.flat["001"].code);
     const residents = await Resident.findAll({ where: { flatId: flat.id }, include: [{ model: Person, include: [{ model: User }] }] });
     let result = [];
@@ -45,4 +46,17 @@ export async function info({ flatNumber }, respond) {
     console.error(error);
     respond(errors.methods.check(errors, error.message));
   }
+}
+
+async function getHouseId(userId: number): Promise<number> {
+  const person = await Person.findOne({
+    where: { userId },
+    include: [
+      {
+        model: Resident,
+        include: [{ model: Flat }]
+      }
+    ]
+  });
+  return (person != null && person.residents.length != 0) ? person.residents[0].flat.houseId : 1;
 }

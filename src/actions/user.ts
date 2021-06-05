@@ -54,7 +54,7 @@ export async function logout(params, respond) {
   try {
     if (!this.authToken) throw new Error(errors.user["004"].code);
     this.deauthenticate();
-    respond(null, true);
+    respond(null, { status: true });
   } catch (error) {
     console.error(error);
     respond(errors.methods.check(errors, error.message));

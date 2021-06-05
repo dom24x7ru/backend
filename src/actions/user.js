@@ -76,7 +76,7 @@ function logout(params, respond) {
             if (!this.authToken)
                 throw new Error(errors_1.default.user["004"].code);
             this.deauthenticate();
-            respond(null, true);
+            respond(null, { status: true });
         }
         catch (error) {
             console.error(error);
