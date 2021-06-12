@@ -1,11 +1,12 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { NotificationToken } from "../../models";
+import { Flat, NotificationToken, Person, Resident, User } from "../../models";
 
 export type tPushData = {
   body: string,
   uri: string,
   to?: string,
-  all?: boolean
+  all?: boolean,
+  houseId?: number
 };
 
 export default class Push {
@@ -23,7 +24,14 @@ export default class Push {
     };
     if (data.all) {
       // отправляем всем
-      const tokens = await NotificationToken.findAll();
+      let tokens = [];
+      if (data.houseId) {
+        const flats = await Flat.findAll({ where: { houseId: data.houseId } });
+        const residents = await Resident.findAll({ where: { flatId: flats.map(flat => flat.id) }, include: [{ model: Person, include: [{ model: User }] }] });
+        tokens = await NotificationToken.findAll({ where: { userId: residents.map(resident => resident.person.userId) } });
+      } else {
+        tokens = await NotificationToken.findAll();
+      }
       const list = tokens.map(item => item.token);
       const pushData = {
         notification: {

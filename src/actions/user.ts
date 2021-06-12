@@ -32,6 +32,7 @@ export async function auth({ mobile, invite, code }, respond) {
       // формируем и отправляем одноразовый код авторизации по смс
       user.smsCode = generateCode(4);
       await user.save();
+      // console.log(`Ваш код: ${user.smsCode}`);
       await SMSC.send([mobile], `Ваш код: ${user.smsCode}`);
 
       respond(null, { status: "OK" });
@@ -125,8 +126,10 @@ export async function saveProfile({ surname, name, midname, telegram, flat, acce
     if (resident == null) {
       await Resident.create({ personId: person.id, flatId: flat });
 
+      const responseUpdate = new ResponseUpdate(this.exchange);
+
       // добавляем пользователя в чаты
-      await attachChats(flat, person);
+      await attachChats(flat, person, responseUpdate);
       
       // проверяем активные голосования и, при необходимости, добавляем в нужные
       await attachVotes(person);
@@ -140,9 +143,7 @@ export async function saveProfile({ surname, name, midname, telegram, flat, acce
         houseId: flatDb.houseId
       });
       // отправляем нотификацию всем соседям
-      Push.send({ body: post.body, uri: post.url, all: true });
-
-      const responseUpdate = new ResponseUpdate(this.exchange);
+      Push.send({ body: post.body, uri: post.url, all: true, houseId: flatDb.houseId });
       
       // обновляем канал "posts"
       responseUpdate.update({
@@ -173,10 +174,8 @@ export async function saveProfile({ surname, name, midname, telegram, flat, acce
   }
 }
 
-async function attachChats(flatId: number, person: Person) {
+async function attachChats(flatId: number, person: Person, responseUpdate: ResponseUpdate) {
   try {
-    const responseUpdate = new ResponseUpdate(this.exchange);
-
     const flatDb = await Flat.findByPk(flatId);
     const flatTxt = `кв. ${flatDb.number}, этаж ${flatDb.floor}, подъезд ${flatDb.section}`;
 
@@ -187,7 +186,7 @@ async function attachChats(flatId: number, person: Person) {
     Cache.getInstance().clear(`imMessages:${channel.id}`);
     // обновляем канал "imChannel"
     responseUpdate.update({
-      userId: this.authToken.id,
+      userId: person.userId,
       createAt: new Date(),
       type: "IM.CHANNEL.UPDATE",
       status: "SUCCESS",
@@ -201,7 +200,7 @@ async function attachChats(flatId: number, person: Person) {
     Cache.getInstance().clear(`imMessages:${channel.id}`);
     // обновляем канал "imChannel"
     responseUpdate.update({
-      userId: this.authToken.id,
+      userId: person.userId,
       createAt: new Date(),
       type: "IM.CHANNEL.UPDATE",
       status: "SUCCESS",
@@ -215,7 +214,7 @@ async function attachChats(flatId: number, person: Person) {
     Cache.getInstance().clear(`imMessages:${channel.id}`);
     // обновляем канал "imChannel"
     responseUpdate.update({
-      userId: this.authToken.id,
+      userId: person.userId,
       createAt: new Date(),
       type: "IM.CHANNEL.UPDATE",
       status: "SUCCESS",

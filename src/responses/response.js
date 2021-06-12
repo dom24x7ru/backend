@@ -37,7 +37,34 @@ class Response {
                     }
                 ]
             });
-            return (person != null && person.residents.length != 0) ? person.residents[0].flat.houseId : 1;
+            if (person != null && person.residents.length != 0) {
+                // уже полностью сформировавшийся пользователь
+                return person.residents[0].flat.houseId;
+            }
+            else {
+                // новый пользователь еще без привязки к квартире и дому
+                const invite = yield models_1.Invite.findOne({
+                    where: { newUserId: userId },
+                    include: [
+                        {
+                            model: models_1.User,
+                            as: "user",
+                            include: [
+                                {
+                                    model: models_1.Person,
+                                    include: [
+                                        {
+                                            model: models_1.Resident,
+                                            include: [{ model: models_1.Flat }]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                });
+                return invite.user.person.residents[0].flat.houseId;
+            }
         });
     }
 }

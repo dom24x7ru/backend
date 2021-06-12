@@ -49,6 +49,7 @@ function auth({ mobile, invite, code }, respond) {
                 // формируем и отправляем одноразовый код авторизации по смс
                 user.smsCode = generateCode(4);
                 yield user.save();
+                // console.log(`Ваш код: ${user.smsCode}`);
                 yield smsc_1.default.send([mobile], `Ваш код: ${user.smsCode}`);
                 respond(null, { status: "OK" });
             }
@@ -156,8 +157,9 @@ function saveProfile({ surname, name, midname, telegram, flat, access }, respond
             let resident = yield models_1.Resident.findOne({ where: { personId: person.id }, include: [{ model: models_1.Flat }] });
             if (resident == null) {
                 yield models_1.Resident.create({ personId: person.id, flatId: flat });
+                const responseUpdate = new response_update_1.default(this.exchange);
                 // добавляем пользователя в чаты
-                yield attachChats(flat, person);
+                yield attachChats(flat, person, responseUpdate);
                 // проверяем активные голосования и, при необходимости, добавляем в нужные
                 yield attachVotes(person);
                 // генерируем новость, что у нас новый сосед
@@ -169,8 +171,7 @@ function saveProfile({ surname, name, midname, telegram, flat, access }, respond
                     houseId: flatDb.houseId
                 });
                 // отправляем нотификацию всем соседям
-                push_1.default.send({ body: post.body, uri: post.url, all: true });
-                const responseUpdate = new response_update_1.default(this.exchange);
+                push_1.default.send({ body: post.body, uri: post.url, all: true, houseId: flatDb.houseId });
                 // обновляем канал "posts"
                 responseUpdate.update({
                     userId: this.authToken.id,
@@ -199,10 +200,9 @@ function saveProfile({ surname, name, midname, telegram, flat, access }, respond
     });
 }
 exports.saveProfile = saveProfile;
-function attachChats(flatId, person) {
+function attachChats(flatId, person, responseUpdate) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const responseUpdate = new response_update_1.default(this.exchange);
             const flatDb = yield models_1.Flat.findByPk(flatId);
             const flatTxt = `кв. ${flatDb.number}, этаж ${flatDb.floor}, подъезд ${flatDb.section}`;
             // в общедомовой
@@ -212,7 +212,7 @@ function attachChats(flatId, person) {
             cache_1.default.getInstance().clear(`imMessages:${channel.id}`);
             // обновляем канал "imChannel"
             responseUpdate.update({
-                userId: this.authToken.id,
+                userId: person.userId,
                 createAt: new Date(),
                 type: "IM.CHANNEL.UPDATE",
                 status: "SUCCESS",
@@ -225,7 +225,7 @@ function attachChats(flatId, person) {
             cache_1.default.getInstance().clear(`imMessages:${channel.id}`);
             // обновляем канал "imChannel"
             responseUpdate.update({
-                userId: this.authToken.id,
+                userId: person.userId,
                 createAt: new Date(),
                 type: "IM.CHANNEL.UPDATE",
                 status: "SUCCESS",
@@ -238,7 +238,7 @@ function attachChats(flatId, person) {
             cache_1.default.getInstance().clear(`imMessages:${channel.id}`);
             // обновляем канал "imChannel"
             responseUpdate.update({
-                userId: this.authToken.id,
+                userId: person.userId,
                 createAt: new Date(),
                 type: "IM.CHANNEL.UPDATE",
                 status: "SUCCESS",

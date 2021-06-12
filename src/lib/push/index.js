@@ -22,7 +22,15 @@ class Push {
             };
             if (data.all) {
                 // отправляем всем
-                const tokens = yield models_1.NotificationToken.findAll();
+                let tokens = [];
+                if (data.houseId) {
+                    const flats = yield models_1.Flat.findAll({ where: { houseId: data.houseId } });
+                    const residents = yield models_1.Resident.findAll({ where: { flatId: flats.map(flat => flat.id) }, include: [{ model: models_1.Person, include: [{ model: models_1.User }] }] });
+                    tokens = yield models_1.NotificationToken.findAll({ where: { userId: residents.map(resident => resident.person.userId) } });
+                }
+                else {
+                    tokens = yield models_1.NotificationToken.findAll();
+                }
                 const list = tokens.map(item => item.token);
                 const pushData = {
                     notification: {

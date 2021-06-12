@@ -1,4 +1,4 @@
-import { Flat, Person, Resident, User } from "../models";
+import { Flat, Invite, Person, Resident, User } from "../models";
 
 export default class Response {
 
@@ -29,6 +29,32 @@ export default class Response {
         }
       ]
     });
-    return (person != null && person.residents.length != 0) ? person.residents[0].flat.houseId : 1;
+    if (person != null && person.residents.length != 0) {
+      // уже полностью сформировавшийся пользователь
+      return person.residents[0].flat.houseId;
+    } else {
+      // новый пользователь еще без привязки к квартире и дому
+      const invite = await Invite.findOne({
+        where: { newUserId: userId },
+        include: [
+          {
+            model: User,
+            as: "user",
+            include: [
+              {
+                model: Person,
+                include: [
+                  {
+                    model: Resident,
+                    include: [{ model: Flat }]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      });
+      return invite.user.person.residents[0].flat.houseId;
+    }
   }
 }
