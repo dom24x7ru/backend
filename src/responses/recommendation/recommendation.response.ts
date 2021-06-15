@@ -46,7 +46,7 @@ export default class RecommendationResponse extends Response {
 
   static async list(userId: number) {
     const houseId = await Response.getHouseId(userId);
-    const list = await Recommendation.findAll({ include: RecommendationResponse.include(houseId) });
+    const list = await Recommendation.findAll({ where: { deleted: false }, include: RecommendationResponse.include(houseId) });
     if (list == null || list.length == 0) return [];
     return list.map(item => RecommendationResponse.create(item));
   }

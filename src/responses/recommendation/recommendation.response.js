@@ -43,7 +43,7 @@ class RecommendationResponse extends response_1.default {
     static list(userId) {
         return __awaiter(this, void 0, void 0, function* () {
             const houseId = yield response_1.default.getHouseId(userId);
-            const list = yield models_1.Recommendation.findAll({ include: RecommendationResponse.include(houseId) });
+            const list = yield models_1.Recommendation.findAll({ where: { deleted: false }, include: RecommendationResponse.include(houseId) });
             if (list == null || list.length == 0)
                 return [];
             return list.map(item => RecommendationResponse.create(item));
