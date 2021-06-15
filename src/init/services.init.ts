@@ -1,4 +1,4 @@
-import { FAQCategory, FAQItem, Instruction } from "../models";
+import { Document, FAQCategory, FAQItem, Instruction } from "../models";
 
 (async () => {
   try {
@@ -32,6 +32,18 @@ import { FAQCategory, FAQItem, Instruction } from "../models";
           });
           }
         }
+      }
+    }
+
+    const documents = await Document.findAll({ where: { houseId: houseIdsource } });
+    if (documents != null) {
+      for (let document of documents) {
+        await Document.create({
+          houseId: houseIddesctination,
+          title: document.title,
+          annotation: document.annotation,
+          url: document.url
+        });
       }
     }
 

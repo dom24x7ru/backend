@@ -42,6 +42,17 @@ const models_1 = require("../models");
                 }
             }
         }
+        const documents = yield models_1.Document.findAll({ where: { houseId: houseIdsource } });
+        if (documents != null) {
+            for (let document of documents) {
+                yield models_1.Document.create({
+                    houseId: houseIddesctination,
+                    title: document.title,
+                    annotation: document.annotation,
+                    url: document.url
+                });
+            }
+        }
         console.log("Завершение скрипта");
     }
     catch (error) {
