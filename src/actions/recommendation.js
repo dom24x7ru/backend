@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.categories = exports.save = void 0;
+exports.del = exports.categories = exports.save = void 0;
 const models_1 = require("../models");
 const response_update_1 = require("../responses/response.update");
 const errors_1 = require("./errors");
@@ -117,6 +117,43 @@ function categories(params, respond) {
     });
 }
 exports.categories = categories;
+function del({ id }, respond) {
+    return __awaiter(this, void 0, void 0, function* () {
+        console.log(">>>>> actions/recommendation.delete");
+        try {
+            if (!this.authToken)
+                throw new Error(errors_1.default.user["004"].code);
+            const user = yield models_1.User.findByPk(this.authToken.id);
+            if (user == null)
+                throw new Error(errors_1.default.user["003"].code);
+            if (user.banned)
+                throw new Error(errors_1.default.user["002"].code);
+            if (user.deleted)
+                throw new Error(errors_1.default.user["003"].code);
+            const person = yield models_1.Person.findOne({ where: { userId: this.authToken.id } });
+            const recommendation = yield models_1.Recommendation.findOne({ where: { id, personId: person.id } });
+            if (recommendation == null)
+                throw new Error(errors_1.default.recommendation["001"].code);
+            recommendation.deleted = true;
+            yield recommendation.save();
+            // обновляем канал "recommendations"
+            const responseUpdate = new response_update_1.default(this.exchange);
+            responseUpdate.update({
+                userId: this.authToken.id,
+                createAt: new Date(),
+                type: "RECOMMENDATION.DELETE",
+                status: "SUCCESS",
+                data: JSON.stringify({ recommendationId: recommendation.id, event: "destroy" })
+            });
+            respond(null, { status: "OK", recommendation: { id: recommendation.id } });
+        }
+        catch (error) {
+            console.error(error);
+            respond(errors_1.default.methods.check(errors_1.default, error.message));
+        }
+    });
+}
+exports.del = del;
 function saveFile(file, person) {
     try {
         const data = Buffer.from(file.base64, "base64");

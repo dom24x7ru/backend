@@ -35,6 +35,7 @@ class ResponseUpdate {
                         yield this.updateVote(eventData);
                         break;
                     case "RECOMMENDATION.SAVE":
+                    case "RECOMMENDATION.DELETE":
                         yield this.updateRecommendation(eventData);
                         break;
                     case "IM.SAVE":

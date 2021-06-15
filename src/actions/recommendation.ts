@@ -102,6 +102,40 @@ export async function categories(params, respond) {
   }
 }
 
+export async function del({ id }, respond) {
+  console.log(">>>>> actions/recommendation.delete");
+  try {
+    if (!this.authToken) throw new Error(errors.user["004"].code);
+    const user = await User.findByPk(this.authToken.id);
+    if (user == null) throw new Error(errors.user["003"].code);
+    if (user.banned) throw new Error(errors.user["002"].code);
+    if (user.deleted) throw new Error(errors.user["003"].code);
+
+    const person = await Person.findOne({ where: { userId: this.authToken.id } });
+
+    const recommendation = await Recommendation.findOne({ where: { id, personId: person.id } });
+    if (recommendation == null) throw new Error(errors.recommendation["001"].code);
+
+    recommendation.deleted = true;
+    await recommendation.save();
+
+    // обновляем канал "recommendations"
+    const responseUpdate = new ResponseUpdate(this.exchange);
+    responseUpdate.update({
+      userId: this.authToken.id,
+      createAt: new Date(),
+      type: "RECOMMENDATION.DELETE",
+      status: "SUCCESS",
+      data: JSON.stringify({ recommendationId: recommendation.id, event: "destroy" })
+    });
+
+    respond(null, { status: "OK", recommendation: { id: recommendation.id } });
+  } catch (error) {
+    console.error(error);
+    respond(errors.methods.check(errors, error.message));
+  }
+}
+
 function saveFile(file: tFile, person: Person) {
   try {
     const data = Buffer.from(file.base64, "base64");

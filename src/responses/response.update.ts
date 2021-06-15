@@ -32,6 +32,7 @@ export default class ResponseUpdate {
           await this.updateVote(eventData);
           break;
         case "RECOMMENDATION.SAVE":
+        case "RECOMMENDATION.DELETE":
           await this.updateRecommendation(eventData);
           break;
         case "IM.SAVE":

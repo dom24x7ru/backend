@@ -47,6 +47,11 @@ __decorate([
     }),
     __metadata("design:type", Object)
 ], Recommendation.prototype, "extra", void 0);
+__decorate([
+    sequelize_typescript_1.Default(false),
+    sequelize_typescript_1.Column,
+    __metadata("design:type", Boolean)
+], Recommendation.prototype, "deleted", void 0);
 Recommendation = __decorate([
     sequelize_typescript_1.Table({
         tableName: "recommendations",
