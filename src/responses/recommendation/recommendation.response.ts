@@ -8,6 +8,7 @@ export default class RecommendationResponse extends Response {
 
   title: string;
   body: string;
+  deleted: boolean;
   extra: tRecommendationExtra;
   category: {
     id: number,
@@ -21,6 +22,7 @@ export default class RecommendationResponse extends Response {
     super(model.id);
     this.title = model.title;
     this.body = model.body;
+    this.deleted = model.deleted;
     this.extra = model.extra;
     this.category = {
       id: model.category.id,

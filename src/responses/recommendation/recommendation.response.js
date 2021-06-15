@@ -18,6 +18,7 @@ class RecommendationResponse extends response_1.default {
         super(model.id);
         this.title = model.title;
         this.body = model.body;
+        this.deleted = model.deleted;
         this.extra = model.extra;
         this.category = {
             id: model.category.id,
