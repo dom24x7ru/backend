@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.saveProfile = exports.invite = exports.logout = exports.auth = void 0;
+exports.del = exports.saveProfile = exports.invite = exports.logout = exports.auth = void 0;
 const models_1 = require("../models");
 const numeral = require("numeral");
 const smsc_1 = require("../lib/smsc");
@@ -200,6 +200,31 @@ function saveProfile({ surname, name, midname, telegram, flat, access }, respond
     });
 }
 exports.saveProfile = saveProfile;
+function del(params, respond) {
+    return __awaiter(this, void 0, void 0, function* () {
+        console.log(">>>>> actions/user.delete");
+        try {
+            if (!this.authToken)
+                throw new Error(errors_1.default.user["004"].code);
+            const user = yield models_1.User.findByPk(this.authToken.id);
+            if (user == null)
+                throw new Error(errors_1.default.user["003"].code);
+            if (user.banned)
+                throw new Error(errors_1.default.user["002"].code);
+            if (user.deleted)
+                throw new Error(errors_1.default.user["003"].code);
+            user.deleted = true;
+            yield user.save();
+            this.deauthenticate();
+            respond(null, { status: true });
+        }
+        catch (error) {
+            console.error(error);
+            respond(errors_1.default.methods.check(errors_1.default, error.message));
+        }
+    });
+}
+exports.del = del;
 function attachChats(flatId, person, responseUpdate) {
     return __awaiter(this, void 0, void 0, function* () {
         try {

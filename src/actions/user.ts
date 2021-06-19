@@ -174,6 +174,26 @@ export async function saveProfile({ surname, name, midname, telegram, flat, acce
   }
 }
 
+export async function del(params, respond) {
+  console.log(">>>>> actions/user.delete");
+  try {
+    if (!this.authToken) throw new Error(errors.user["004"].code);
+    const user = await User.findByPk(this.authToken.id);
+    if (user == null) throw new Error(errors.user["003"].code);
+    if (user.banned) throw new Error(errors.user["002"].code);
+    if (user.deleted) throw new Error(errors.user["003"].code);
+
+    user.deleted = true;
+    await user.save();
+
+    this.deauthenticate();
+    respond(null, { status: true });
+  } catch (error) {
+    console.error(error);
+    respond(errors.methods.check(errors, error.message));
+  }
+}
+
 async function attachChats(flatId: number, person: Person, responseUpdate: ResponseUpdate) {
   try {
     const flatDb = await Flat.findByPk(flatId);
