@@ -47,7 +47,6 @@
   },
   "devDependencies": {
     "@types/jest": "^26.0.23",
-    "babel-preset-env": "^1.7.0",
     "cypress": "^7.4.0",
     "jest": "^27.0.1",
     "sequelize-typescript-migration": "0.0.1-beta.3"
