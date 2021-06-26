@@ -87,6 +87,7 @@ class UserResponse extends response_1.default {
             const user = yield models_1.User.findByPk(socket.authToken.id);
             if (user == null || user.banned || user.deleted)
                 return null;
+            console.log(`USER CHANNEL`);
             return yield UserResponse.info(socket.authToken.id);
         });
     }
