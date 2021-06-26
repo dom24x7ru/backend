@@ -64,8 +64,6 @@ export default class UserResponse extends Response {
       token.houseId = invite.user.person.residents[0].flat.houseId;
     }
 
-    console.log(`USER HOUSEID: ${token.houseId}`);
-
     return token;
   }
 
@@ -85,8 +83,6 @@ export default class UserResponse extends Response {
     if (socket.authToken == null) return null;
     const user = await User.findByPk(socket.authToken.id);
     if (user == null || user.banned || user.deleted) return null;
-
-    console.log(`USER CHANNEL`);
 
     return await UserResponse.info(socket.authToken.id);
   }
