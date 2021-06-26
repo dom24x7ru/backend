@@ -64,8 +64,6 @@ for (var i in SOCKETCLUSTER_OPTIONS) {
 }
 
 var start = function () {
-  console.log('   >> Current version: 17.0.0');
-
   var socketCluster = new SocketCluster(options);
 
   socketCluster.on(socketCluster.EVENT_WORKER_CLUSTER_START, function (workerClusterInfo) {
