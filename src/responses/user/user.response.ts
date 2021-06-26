@@ -64,8 +64,6 @@ export default class UserResponse extends Response {
       token.houseId = invite.user.person.residents[0].flat.houseId;
     }
 
-    console.log(token);
-
     return token;
   }
 
