@@ -63,6 +63,7 @@ class UserResponse extends response_1.default {
                 });
                 token.houseId = invite.user.person.residents[0].flat.houseId;
             }
+            console.log(`USER HOUSEID: ${token.houseId}`);
             return token;
         });
     }
