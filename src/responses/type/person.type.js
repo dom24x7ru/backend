@@ -22,7 +22,8 @@ function getPerson(model) {
             id: flat.id,
             number: flat.number,
             section: flat.section,
-            floor: flat.floor
+            floor: flat.floor,
+            square: flat.square
         };
     }
     person.deleted = false;

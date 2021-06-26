@@ -10,7 +10,8 @@ export type tPerson = {
     id: number,
     number: number,
     section: number,
-    floor: number
+    floor: number,
+    square: number
   }
 };
 
@@ -36,7 +37,8 @@ export function getPerson(model: Person): tPerson {
       id: flat.id,
       number: flat.number,
       section: flat.section,
-      floor: flat.floor
+      floor: flat.floor,
+      square: flat.square
     };
   }
 
