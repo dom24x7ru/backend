@@ -57,12 +57,12 @@ function save({ title, questions, anonymous, multi, type }, respond) {
             else if (type == "section") {
                 // весь подъезд
                 const flats = yield models_1.Flat.findAll({ where: { houseId: flat.houseId, section } });
-                residents = yield models_1.Resident.findAll({ where: { flatId: flats.map(flat => flat.id) } });
+                residents = yield models_1.Resident.findAll({ where: { flatId: flats.map(flat => flat.id) }, include: [{ model: models_1.Person }] });
             }
             else if (type == "floor") {
                 // весь этаж в подъезде
                 const flats = yield models_1.Flat.findAll({ where: { houseId: flat.houseId, section, floor } });
-                residents = yield models_1.Resident.findAll({ where: { flatId: flats.map(flat => flat.id) } });
+                residents = yield models_1.Resident.findAll({ where: { flatId: flats.map(flat => flat.id) }, include: [{ model: models_1.Person }] });
             }
             for (let resident of residents) {
                 models_1.VotePerson.create({ voteId: vote.id, personId: resident.personId });

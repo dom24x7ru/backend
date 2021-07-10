@@ -44,11 +44,11 @@ export async function save({ title, questions, anonymous, multi, type }, respond
     } else if (type == "section") {
       // весь подъезд
       const flats = await Flat.findAll({ where: { houseId: flat.houseId, section } });
-      residents = await Resident.findAll({ where: { flatId: flats.map(flat => flat.id) } });
+      residents = await Resident.findAll({ where: { flatId: flats.map(flat => flat.id) }, include: [{ model: Person }] });
     } else if (type == "floor") {
       // весь этаж в подъезде
       const flats = await Flat.findAll({ where: { houseId: flat.houseId, section, floor } });
-      residents = await Resident.findAll({ where: { flatId: flats.map(flat => flat.id) } });
+      residents = await Resident.findAll({ where: { flatId: flats.map(flat => flat.id) }, include: [{ model: Person }] });
     }
     for (let resident of residents) {
       VotePerson.create({ voteId: vote.id, personId: resident.personId });
