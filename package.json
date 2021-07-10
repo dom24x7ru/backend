@@ -62,7 +62,8 @@
   "scripts": {
     "start": "babel-node server.js",
     "dev": "tsc && babel-node server.js",
-    "init": "tsc && babel-node ./src/init/dom24x7.init.js",
+    "init": "tsc && babel-node ./src/scripts/dom24x7.init.js",
+    "change:flat": "tsc && babel-node ./src/scripts/change.flat.js",
     "test": "clear && tsc && jest",
     "migration": "tsc && babel-node ./src/makeMigration.js"
   }
