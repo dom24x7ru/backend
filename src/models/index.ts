@@ -23,6 +23,7 @@ import Vote from "./vote/vote.model";
 import VoteQuestion from "./vote/vote.question.model";
 import VoteAnswer from "./vote/vote.answer.model";
 import VotePerson from "./vote/vote.person.model";
+import Oss from "./vote/oss.model";
 
 import IMMessage from "./im/im.message.model";
 import IMChannel from "./im/im.channel.model";
@@ -43,7 +44,7 @@ export {
   Person, House, Flat, Resident, Invite,
   Post, Instruction, Document,
   FAQCategory, FAQItem,
-  Vote, VoteQuestion, VoteAnswer, VotePerson,
+  Vote, VoteQuestion, VoteAnswer, VotePerson, Oss,
   IMMessage, IMChannel, IMChannelPerson, IMMessageShow,
   RecommendationCategory, Recommendation,
   NotificationToken, Version,

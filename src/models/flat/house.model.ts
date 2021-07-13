@@ -1,5 +1,5 @@
 import { AllowNull, Column, DataType, HasMany, Model, Table, Unique } from "sequelize-typescript";
-import { Document, FAQCategory, Flat, IMChannel, Instruction, Post, RecommendationCategory, Vote } from "..";
+import { Document, FAQCategory, Flat, IMChannel, Instruction, Oss, Post, RecommendationCategory, Vote } from "..";
 import { tDadataInfo } from "../../lib/dadata";
 
 export type tHouseExtra = {
@@ -72,4 +72,7 @@ export default class House extends Model<House> {
 
   @HasMany(() => Vote)
   votes: Vote[];
+
+  @HasMany(() => Oss)
+  ossList: Oss[];
 }

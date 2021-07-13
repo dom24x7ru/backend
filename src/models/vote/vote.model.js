@@ -77,6 +77,18 @@ __decorate([
     __metadata("design:type", __1.User)
 ], Vote.prototype, "user", void 0);
 __decorate([
+    sequelize_typescript_1.Index,
+    sequelize_typescript_1.ForeignKey(() => __1.Oss),
+    sequelize_typescript_1.Column({
+        comment: "Привязка вопроса к ОСС"
+    }),
+    __metadata("design:type", Number)
+], Vote.prototype, "ossId", void 0);
+__decorate([
+    sequelize_typescript_1.BelongsTo(() => __1.Oss),
+    __metadata("design:type", __1.Oss)
+], Vote.prototype, "oss", void 0);
+__decorate([
     sequelize_typescript_1.HasMany(() => __1.VoteQuestion),
     __metadata("design:type", Array)
 ], Vote.prototype, "questions", void 0);

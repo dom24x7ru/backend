@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Version = exports.NotificationToken = exports.Recommendation = exports.RecommendationCategory = exports.IMMessageShow = exports.IMChannelPerson = exports.IMChannel = exports.IMMessage = exports.VotePerson = exports.VoteAnswer = exports.VoteQuestion = exports.Vote = exports.FAQItem = exports.FAQCategory = exports.Document = exports.Instruction = exports.Post = exports.Invite = exports.Resident = exports.Flat = exports.House = exports.Person = exports.Role = exports.User = exports.Session = exports.EventLog = exports.Event = exports.sequelize = void 0;
+exports.Version = exports.NotificationToken = exports.Recommendation = exports.RecommendationCategory = exports.IMMessageShow = exports.IMChannelPerson = exports.IMChannel = exports.IMMessage = exports.Oss = exports.VotePerson = exports.VoteAnswer = exports.VoteQuestion = exports.Vote = exports.FAQItem = exports.FAQCategory = exports.Document = exports.Instruction = exports.Post = exports.Invite = exports.Resident = exports.Flat = exports.House = exports.Person = exports.Role = exports.User = exports.Session = exports.EventLog = exports.Event = exports.sequelize = void 0;
 const event_model_1 = require("./event/event.model");
 exports.Event = event_model_1.default;
 const logger_model_1 = require("./event/logger.model");
@@ -39,6 +39,8 @@ const vote_answer_model_1 = require("./vote/vote.answer.model");
 exports.VoteAnswer = vote_answer_model_1.default;
 const vote_person_model_1 = require("./vote/vote.person.model");
 exports.VotePerson = vote_person_model_1.default;
+const oss_model_1 = require("./vote/oss.model");
+exports.Oss = oss_model_1.default;
 const im_message_model_1 = require("./im/im.message.model");
 exports.IMMessage = im_message_model_1.default;
 const im_channel_model_1 = require("./im/im.channel.model");

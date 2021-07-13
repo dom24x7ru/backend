@@ -81,6 +81,10 @@ __decorate([
     sequelize_typescript_1.HasMany(() => __1.Vote),
     __metadata("design:type", Array)
 ], House.prototype, "votes", void 0);
+__decorate([
+    sequelize_typescript_1.HasMany(() => __1.Oss),
+    __metadata("design:type", Array)
+], House.prototype, "ossList", void 0);
 House = __decorate([
     sequelize_typescript_1.Table({
         tableName: "houses",

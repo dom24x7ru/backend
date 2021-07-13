@@ -1,5 +1,5 @@
 import { Table, Model, ForeignKey, Column, BelongsTo, Default, DataType, HasMany, Unique } from "sequelize-typescript";
-import { IMChannelPerson, IMMessage, IMMessageShow, Recommendation, Resident, User, VoteAnswer, VotePerson } from "..";
+import { IMChannelPerson, IMMessage, IMMessageShow, Oss, Recommendation, Resident, User, VoteAnswer, VotePerson } from "..";
 
 export type tAccessLevel = "all" | "friends" | "nothing";
 export type tAccessNameFormat = "all" | "name";
@@ -82,4 +82,7 @@ export default class Person extends Model<Person> {
 
   @HasMany(() => Recommendation)
   recommendations: Recommendation[];
+
+  @HasMany(() => Oss)
+  ossList: Oss[];
 }
